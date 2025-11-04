@@ -1,0 +1,166 @@
+{% load static %}
+{% load calendar_tags %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Lesezirkel Osnabrück e.V.{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary d-flex align-items-center" href="{% url 'home' %}">
+                <img src="{% static_with_version 'images/logo.png' %}" alt="Lesezirkel Logo" style="height: 65px; width: auto;" class="me-2">
+                Lesezirkel Osnabrück
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Startseite</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'about' %}">Über uns</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'events' %}">Veranstaltungen</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'news' %}">Nachrichten</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'gallery' %}">Galerie</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'documents' %}">Dokumente</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'contact' %}">Kontakt</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light mt-5">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5 class="mb-3 d-flex align-items-center text-white">
+                        <img src="{% static 'images/logo.png' %}" alt="Lesezirkel Logo" style="height: 32px; width: auto;" class="me-2">
+                        Lesezirkel Osnabrück e.V.
+                    </h5>
+                    <p class="text-light opacity-75">
+                        Wir fördern die Liebe zur Literatur und schaffen eine Gemeinschaft für Buchliebhaber in Osnabrück.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="text-light me-3" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-light me-3" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-light me-3" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-light" title="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3 text-white">Seiten</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'home' %}" class="text-light opacity-75 text-decoration-none">Startseite</a></li>
+                        <li><a href="{% url 'about' %}" class="text-light opacity-75 text-decoration-none">Über uns</a></li>
+                        <li><a href="{% url 'events' %}" class="text-light opacity-75 text-decoration-none">Veranstaltungen</a></li>
+                        <li><a href="{% url 'news' %}" class="text-light opacity-75 text-decoration-none">Nachrichten</a></li>
+                        <li><a href="{% url 'documents' %}" class="text-light opacity-75 text-decoration-none">Dokumente</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6 class="mb-3 text-white">Kontakt</h6>
+                    <ul class="list-unstyled text-light opacity-75">
+                        <li><i class="fas fa-map-marker-alt me-2 text-primary"></i>Osnabrück, Deutschland</li>
+                        {% comment %} <li><i class="fas fa-phone me-2 text-primary"></i>+49 XXX XXX XXXX</li> {% endcomment %}
+                        <li><i class="fas fa-envelope me-2 text-primary"></i>info@lesezirkel-osnabrueck.de</li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6 class="mb-3 text-white">Partner</h6>
+                    <div class="mb-3">
+                        <a href="https://www.landkreis-osnabrueck.de/" target="_blank" class="text-decoration-none text-light opacity-75">
+                            <i class="fas fa-external-link-alt me-2 text-primary"></i>Landkreis Osnabrück
+                        </a>
+                    </div>
+                    <div class="mb-3">
+                        <a href="https://europa.eu/" target="_blank" class="text-decoration-none text-light opacity-75">
+                            <i class="fas fa-star-circle me-2 text-warning"></i>Europäische Union
+                        </a>
+                    </div>
+                    <div class="mb-3">
+                        <a href="https://www.osnabrueck.de/" target="_blank" class="text-decoration-none text-light opacity-75">
+                            <i class="fas fa-city me-2 text-primary"></i>Stadt Osnabrück
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="border-top border-secondary">
+            <div class="container py-3">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="text-light opacity-75 small mb-0">
+                            © 2024 Lesezirkel Osnabrück e.V. Alle Rechte vorbehalten.
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="{% url 'privacy' %}" class="text-light opacity-75 text-decoration-none small me-3">Datenschutz</a>
+                        <a href="{% url 'impressum' %}" class="text-light opacity-75 text-decoration-none small me-3">Impressum</a>
+                        <span class="text-light opacity-75 small">
+                            Gefördert durch
+                            <a href="https://europa.eu/" target="_blank" class="text-warning">
+                                <i class="fas fa-star me-1"></i>EU
+                            </a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {# Cache busting query param to ensure users load latest JS (removes old fake submit logic) #}
+    <script src="{% static 'js/main.js' %}?v=20240210"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

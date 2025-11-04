@@ -1,0 +1,16 @@
+[Unit]
+Description=Gunicorn instance to serve Lesezirkel Osnabrück
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/path/to/your/project
+Environment="PATH=/path/to/your/project/venv/bin"
+EnvironmentFile=/path/to/your/project/.env
+ExecStart=/path/to/your/project/venv/bin/gunicorn --config gunicorn.conf.py lesezirkel_osnabrueck.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

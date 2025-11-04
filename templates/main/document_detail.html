@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ document.title }} - Dokumente - Lesezirkel Osnabrück{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Back Button -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="{% url 'documents' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Zurück zu Dokumenten
+            </a>
+        </div>
+    </div>
+
+    <!-- Document Details -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header {% if document.is_featured %}bg-warning{% else %}bg-primary text-white{% endif %}">
+                    <h1 class="card-title mb-0 h3">
+                        {% if document.is_featured %}
+                            <i class="fas fa-star"></i>
+                        {% endif %}
+                        {{ document.title }}
+                    </h1>
+                </div>
+                <div class="card-body">
+                    {% if document.description %}
+                    <div class="mb-4">
+                        <h5>Beschreibung</h5>
+                        <p class="text-muted">{{ document.description|linebreaks }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Document Info -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-folder text-primary"></i> Kategorie</h6>
+                            <p>
+                                {% for cat_key, cat_name in document.CATEGORY_CHOICES %}
+                                    {% if cat_key == document.category %}{{ cat_name }}{% endif %}
+                                {% endfor %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-calendar text-primary"></i> Erstellt am</h6>
+                            <p>{{ document.created_at|date:"d. F Y" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-hdd text-primary"></i> Dateigröße</h6>
+                            <p>{{ document.formatted_file_size }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-download text-primary"></i> Downloads</h6>
+                            <p>{{ document.download_count }}x heruntergeladen</p>
+                        </div>
+                    </div>
+
+                    <!-- Download Section -->
+                    <div class="border-top pt-4">
+                        <h5 class="mb-3">Dokument herunterladen</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="text-center p-4 border rounded">
+                                    <!-- File Type Icon -->
+                                    {% if document.file_extension == '.pdf' %}
+                                        <i class="fas fa-file-pdf text-danger fa-4x mb-3"></i>
+                                    {% elif document.file_extension in '.doc,.docx' %}
+                                        <i class="fas fa-file-word text-primary fa-4x mb-3"></i>
+                                    {% elif document.file_extension in '.xls,.xlsx' %}
+                                        <i class="fas fa-file-excel text-success fa-4x mb-3"></i>
+                                    {% elif document.file_extension in '.ppt,.pptx' %}
+                                        <i class="fas fa-file-powerpoint text-warning fa-4x mb-3"></i>
+                                    {% else %}
+                                        <i class="fas fa-file-alt text-secondary fa-4x mb-3"></i>
+                                    {% endif %}
+                                    
+                                    <h6>Als PDF herunterladen</h6>
+                                    <p class="text-muted small">Automatisch konvertiert für beste Kompatibilität</p>
+                                    
+                                    <a href="{{ document.get_download_url }}" 
+                                       class="btn btn-primary btn-lg">
+                                        <i class="fas fa-download"></i> PDF Download
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-info">
+                                    <h6><i class="fas fa-info-circle"></i> Download-Hinweise</h6>
+                                    <ul class="mb-0 small">
+                                        <li>Das Dokument wird automatisch als PDF bereitgestellt</li>
+                                        <li>Originaldateien werden in ein optimiertes PDF-Format konvertiert</li>
+                                        <li>Der Download startet nach dem Klick automatisch</li>
+                                        <li>Alle Downloads sind kostenlos</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Schnellaktionen</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ document.get_download_url }}" 
+                           class="btn btn-primary">
+                            <i class="fas fa-download"></i> Jetzt herunterladen
+                        </a>
+                        <a href="{% url 'documents' %}?category={{ document.category }}" 
+                           class="btn btn-outline-secondary">
+                            <i class="fas fa-folder"></i> Ähnliche Dokumente
+                        </a>
+                        <a href="{% url 'contact' %}" 
+                           class="btn btn-outline-info">
+                            <i class="fas fa-envelope"></i> Fragen? Kontakt
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Stats -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Dokumentstatistiken</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h4 class="text-primary">{{ document.download_count }}</h4>
+                                <small class="text-muted">Downloads</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success">{{ document.formatted_file_size }}</h4>
+                            <small class="text-muted">Größe</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Documents -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h4>Weitere Dokumente aus dieser Kategorie</h4>
+            <div class="row">
+                {% for related_doc in related_documents %}
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ related_doc.title|truncatechars:50 }}</h6>
+                            <p class="card-text small text-muted">{{ related_doc.description|truncatewords:10 }}</p>
+                            <a href="{% url 'document_detail' related_doc.pk %}" 
+                               class="btn btn-sm btn-outline-primary">
+                                Details anzeigen
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <p class="text-muted">Keine verwandten Dokumente gefunden.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

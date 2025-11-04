@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Galerie - Lesezirkel Osnabrück e.V.{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-3">Galerie</h1>
+                <p class="lead">Eindrücke von unseren Veranstaltungen</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Gallery -->
+<section class="section">
+    <div class="container">
+        {% if gallery_items %}
+            <div class="row">
+                {% for item in gallery_items %}
+                <div class="col-lg-3 col-md-4 col-6 mb-4">
+                    <div class="position-relative">
+                        <img src="{{ item.image.url }}" alt="{{ item.title }}" class="gallery-img">
+                        <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-2">
+                            <small>{{ item.title }}</small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Galerieseiten">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Vorherige</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Nächste</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-images fa-4x text-muted mb-4"></i>
+                <h3 class="text-muted">Noch keine Fotos vorhanden</h3>
+                <p class="text-muted">Fotos von unseren Veranstaltungen werden bald hinzugefügt.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

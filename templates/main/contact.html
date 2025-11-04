@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Kontakt - Lesezirkel Osnabrück e.V.{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-3">Kontakt</h1>
+                <p class="lead">Nehmen Sie Kontakt mit uns auf und stellen Sie Ihre Fragen</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="section">
+    <div class="container">
+        <div class="row">
+            <!-- Contact Form -->
+            <div class="col-lg-8 mb-5">
+                <div class="card shadow border-0">
+                    <div class="card-body p-5">
+                        <h3 class="mb-4">Senden Sie uns eine Nachricht</h3>
+                        <form method="post" id="contact-form" novalidate>
+                            {% csrf_token %}
+                            {# Non-field errors #}
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {% for err in form.non_field_errors %}{{ err }}<br>{% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_name" class="form-label">Vor- und Nachname *</label>
+                                    {{ form.name }}
+                                    {% if form.name.errors %}
+                                        <div class="text-danger small">{% for err in form.name.errors %}{{ err }}{% endfor %}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_email" class="form-label">E-Mail *</label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                        <div class="text-danger small">{% for err in form.email.errors %}{{ err }}{% endfor %}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_subject" class="form-label">Betreff *</label>
+                                {{ form.subject }}
+                                {% if form.subject.errors %}
+                                    <div class="text-danger small">{% for err in form.subject.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-4">
+                                <label for="id_message" class="form-label">Nachricht *</label>
+                                {{ form.message }}
+                                {% if form.message.errors %}
+                                    <div class="text-danger small">{% for err in form.message.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            {# Honeypot hidden field (rendered but hidden) #}
+                            {{ form.hp_field }}
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Nachricht senden
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="col-lg-4">
+                <!-- Contact Details -->
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h4 class="mb-4">Kontaktinformationen</h4>
+                        <div class="contact-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="contact-icon bg-primary text-white rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Adresse</h6>
+                                    <p class="text-muted mb-0">Musterstraße 123, 49074 Osnabrück, Deutschland</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% comment %} <div class="contact-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="contact-icon bg-primary text-white rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Telefon</h6>
+                                    <p class="text-muted mb-0">+49 XXX XXX XXXX</p>
+                                </div>
+                            </div>
+                        </div> {% endcomment %}
+                        
+                        <div class="contact-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="contact-icon bg-primary text-white rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">E-Mail</h6>
+                                    <p class="text-muted mb-0">info@kulturbrucke-ibbenbueren.de</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% comment %} <div class="contact-item">
+                            <div class="d-flex align-items-center">
+                                <div class="contact-icon bg-primary text-white rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Öffnungszeiten</h6>
+                                    <p class="text-muted mb-0">Mo-Fr: 09:00-17:00</p>
+                                </div>
+                            </div>
+                        </div> {% endcomment %}
+                    </div>
+                </div>
+
+                <!-- Social Media -->
+                <div class="card shadow border-0">
+                    <div class="card-body p-4">
+                        <h4 class="mb-4">Soziale Medien</h4>
+                        <p class="text-muted mb-3">Folgen Sie uns auf den sozialen Medien:</p>
+                        <div class="social-links">
+                            <a href="#" class="btn btn-outline-primary me-2 mb-2">
+                                <i class="fab fa-facebook-f"></i> Facebook
+                            </a>
+                            <a href="#" class="btn btn-outline-primary me-2 mb-2">
+                                <i class="fab fa-instagram"></i> Instagram
+                            </a>
+                            <a href="#" class="btn btn-outline-primary me-2 mb-2">
+                                <i class="fab fa-twitter"></i> Twitter
+                            </a>
+                            <a href="#" class="btn btn-outline-primary me-2 mb-2">
+                                <i class="fab fa-youtube"></i> YouTube
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section (Optional) -->
+<section class="section bg-light-gray">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h3 class="text-center mb-4">Unser Standort</h3>
+                <div class="map-container bg-secondary rounded shadow" style="height: 400px;">
+                    <div class="d-flex align-items-center justify-content-center h-100 text-white">
+                        <div class="text-center">
+                            <i class="fas fa-map-marked-alt fa-3x mb-3"></i>
+                            <h5>Osnabrück, Deutschland</h5>
+                            <p>Kartenintegration wird bald hinzugefügt</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h3 class="text-center mb-5">Häufig gestellte Fragen</h3>
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header" id="faq1">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                Wie kann ich Mitglied im Verein werden?
+                            </button>
+                        </h2>
+                        <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Um Mitglied in unserem Verein zu werden, können Sie Kontakt mit uns aufnehmen. Es reicht aus, das Mitgliedsformular auszufüllen und die erforderlichen Unterlagen einzureichen.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header" id="faq2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                Wer kann an Ihren Veranstaltungen teilnehmen?
+                            </button>
+                        </h2>
+                        <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Unsere Veranstaltungen sind für alle offen. Wir organisieren Veranstaltungen für die gesamte Gesellschaft ohne Unterschied von Alter, Geschlecht, Religion oder ethnischer Herkunft.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header" id="faq3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                Wie kann ich als Freiwilliger beitragen?
+                            </button>
+                        </h2>
+                        <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Um Freiwilliger zu werden, nehmen Sie Kontakt mit uns auf. Wir benötigen Freiwillige in verschiedenen Bereichen (Organisation, Übersetzung, technische Unterstützung usw.).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

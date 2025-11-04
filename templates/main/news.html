@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Nachrichten - Lesezirkel Osnabrück e.V.{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-3">Nachrichten</h1>
+                <p class="lead">Folgen Sie unseren neuesten Nachrichten</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- News List -->
+<section class="section">
+    <div class="container">
+        {% if news_list %}
+            <div class="row">
+                {% for news in news_list %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100">
+                        {% if news.image %}
+                            <img src="{{ news.image.url }}" class="card-img-top" alt="{{ news.title }}">
+                        {% else %}
+                            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 250px;">
+                                <i class="fas fa-newspaper fa-3x"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ news.published_date|date:"d M Y" }}
+                                </small>
+                                {% if news.is_featured %}
+                                    <span class="badge bg-warning text-dark">Empfohlen</span>
+                                {% endif %}
+                            </div>
+                            <h5 class="card-title">{{ news.title }}</h5>
+                            <p class="card-text flex-grow-1">{{ news.content|truncatewords:20 }}</p>
+                            <a href="{% url 'news_detail' news.pk %}" class="btn btn-primary mt-auto">Weiterlesen</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Nachrichtenseiten">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Vorherige</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Nächste</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-newspaper fa-4x text-muted mb-4"></i>
+                <h3 class="text-muted">Noch keine Nachrichten vorhanden</h3>
+                <p class="text-muted">Unsere Nachrichten werden bald hier veröffentlicht.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

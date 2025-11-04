@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dokumente - Lesezirkel Osnabrück{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Page Header -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 text-primary">Dokumente</h1>
+            <p class="lead">Laden Sie wichtige Dokumente, Formulare und Informationsmaterial herunter</p>
+        </div>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Kategorien filtern</h5>
+                    <div class="btn-group flex-wrap" role="group">
+                        <a href="{% url 'documents' %}" 
+                           class="btn {% if not selected_category %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            Alle Dokumente
+                        </a>
+                        {% for category_key, category_name in categories %}
+                        <a href="{% url 'documents' %}?category={{ category_key }}" 
+                           class="btn {% if selected_category == category_key %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            {{ category_name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Documents Grid -->
+    <div class="row">
+        {% for document in documents %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 {% if document.is_featured %}border-warning{% endif %}">
+                {% if document.is_featured %}
+                <div class="card-header bg-warning text-dark">
+                    <i class="fas fa-star"></i> Hervorgehoben
+                </div>
+                {% endif %}
+                
+                <div class="card-body d-flex flex-column">
+                    <div class="mb-3">
+                        <!-- File Type Icon -->
+                        {% if document.file_extension == '.pdf' %}
+                            <i class="fas fa-file-pdf text-danger fa-3x"></i>
+                        {% elif document.file_extension in '.doc,.docx' %}
+                            <i class="fas fa-file-word text-primary fa-3x"></i>
+                        {% elif document.file_extension in '.xls,.xlsx' %}
+                            <i class="fas fa-file-excel text-success fa-3x"></i>
+                        {% elif document.file_extension in '.ppt,.pptx' %}
+                            <i class="fas fa-file-powerpoint text-warning fa-3x"></i>
+                        {% else %}
+                            <i class="fas fa-file-alt text-secondary fa-3x"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <h5 class="card-title">{{ document.title }}</h5>
+                    
+                    {% if document.description %}
+                    <p class="card-text text-muted">{{ document.description|truncatewords:20 }}</p>
+                    {% endif %}
+                    
+                    <div class="mt-auto">
+                        <!-- Document Info -->
+                        <div class="small text-muted mb-3">
+                            <div class="row">
+                                <div class="col-6">
+                                    <i class="fas fa-folder"></i>
+                                    {% for cat_key, cat_name in categories %}
+                                        {% if cat_key == document.category %}{{ cat_name }}{% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div class="col-6 text-end">
+                                    <i class="fas fa-hdd"></i> {{ document.formatted_file_size }}
+                                </div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col-6">
+                                    <i class="fas fa-calendar"></i> {{ document.created_at|date:"d.m.Y" }}
+                                </div>
+                                <div class="col-6 text-end">
+                                    <i class="fas fa-download"></i> {{ document.download_count }}x
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2">
+                            <a href="{{ document.get_download_url }}" 
+                               class="btn btn-primary" 
+                               title="Als PDF herunterladen">
+                                <i class="fas fa-download"></i> PDF herunterladen
+                            </a>
+                            {% if document.description %}
+                            <a href="{% url 'document_detail' document.pk %}" 
+                               class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-info-circle"></i> Details anzeigen
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle fa-2x mb-3"></i>
+                <h4>Keine Dokumente gefunden</h4>
+                <p class="mb-0">
+                    {% if selected_category %}
+                        In der ausgewählten Kategorie sind derzeit keine Dokumente verfügbar.
+                    {% else %}
+                        Derzeit sind keine Dokumente zum Download verfügbar.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <nav aria-label="Dokumente Pagination">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if selected_category %}&category={{ selected_category }}{% endif %}">Erste</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}">Zurück</a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if selected_category %}&category={{ selected_category }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}">Weiter</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if selected_category %}&category={{ selected_category }}{% endif %}">Letzte</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Download Info -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="alert alert-light">
+                <h5><i class="fas fa-info-circle text-primary"></i> Hinweise zum Download</h5>
+                <ul class="mb-0">
+                    <li>Alle Dokumente werden automatisch als PDF bereitgestellt</li>
+                    <li>Originaldateien werden bei der Konvertierung in ein lesbares PDF-Format umgewandelt</li>
+                    <li>Bei Problemen beim Download kontaktieren Sie uns bitte über unser <a href="{% url 'contact' %}">Kontaktformular</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

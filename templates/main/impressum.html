@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Impressum - Lesezirkel Osnabrück e.V.{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-3">📌 Impressum</h1>
+                <p class="lead">Vereinsangaben gemäß § 5 TMG</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Impressum Content -->
+<section class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow border-0">
+                    <div class="card-body p-5">
+                        <div class="mb-5">
+                            <h3 class="text-primary mb-4">Vereinsangaben</h3>
+                            <div class="row">
+                                <div class="col-12">
+                                    <h4 class="h5 mb-3">Lesezirkel Osnabrück e.V.</h4>
+                                    <address class="mb-4">
+                                        <strong>Anschrift:</strong><br>
+                                        Musterstraße 123<br>
+                                        49074 Osnabrück<br>
+                                        Niedersachsen<br>
+                                        Deutschland
+                                    </address>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <h3 class="text-primary mb-4">Vertretungsberechtigter Vorstand</h3>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <h5 class="h6 text-primary">Vorsitzender:</h5>
+                                    <p class="mb-0">[Name wird ergänzt]</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h5 class="h6 text-primary">Stellvertretender Vorsitzender:</h5>
+                                    <p class="mb-0">[Name wird ergänzt]</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h5 class="h6 text-primary">Stellvertretende Vorsitzende:</h5>
+                                    <p class="mb-0">[Name wird ergänzt]</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h5 class="h6 text-primary">Schriftführer:</h5>
+                                    <p class="mb-0">[Name wird ergänzt]</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h5 class="h6 text-primary">Kassenwart:</h5>
+                                    <p class="mb-0">[Name wird ergänzt]</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <h3 class="text-primary mb-4">Kontakt</h3>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-envelope text-primary me-3"></i>
+                                        <div>
+                                            <small class="text-muted">E-Mail:</small><br>
+                                            <a href="mailto:info@lesezirkel-osnabrueck.de" class="text-decoration-none">
+                                                info@lesezirkel-osnabrueck.de
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-phone text-primary me-3"></i>
+                                        {% comment %} <div>
+                                            <small class="text-muted">Telefon:</small><br>
+                                            <span>+49 XXX XXX XXXX</span>
+                                        </div> {% endcomment %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <h3 class="text-primary mb-4">Vereinsregister</h3>
+                            <p class="mb-0">
+                                <strong>Registergericht:</strong> Amtsgericht Osnabrück<br>
+                                <strong>Vereinsregister Nr.:</strong> [Registrierungsnummer wird ergänzt]
+                            </p>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h5 class="alert-heading">
+                                <i class="fas fa-info-circle me-2"></i>Haftungshinweis
+                            </h5>
+                            <p class="mb-0">
+                                Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte 
+                                externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

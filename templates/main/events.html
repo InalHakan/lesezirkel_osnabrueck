@@ -1,0 +1,829 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load calendar_tags %}
+
+{% block title %}Veranstaltungen - Lesezirkel Osnabrück e.V.{% endblock %}
+
+{% block extra_css %}
+<style>
+.calendar-container {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: visible; /* Changed from hidden to visible */
+    position: relative;
+    z-index: 1;
+}
+
+.calendar-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.month-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-arrow {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.nav-arrow:hover {
+    background: rgba(255,255,255,0.3);
+    color: white;
+    transform: scale(1.1);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    position: relative;
+    z-index: 1;
+}
+
+.calendar-day-header {
+    background: #f8f9fa;
+    padding: 1rem;
+    text-align: center;
+    font-weight: 600;
+    color: var(--dark-color);
+    border-bottom: 1px solid #dee2e6;
+}
+
+.calendar-day {
+    min-height: 120px;
+    border-right: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.5rem;
+    position: relative;
+    background: white;
+    transition: var(--transition);
+    z-index: 2;
+}
+
+.calendar-day:hover {
+    background: #f8f9fa;
+    z-index: 1000; /* Elevated z-index on hover */
+}
+
+.calendar-day.other-month {
+    color: #ccc;
+    background: #fafafa;
+}
+
+.calendar-day.today {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(231, 76, 60, 0.1));
+    border: 2px solid var(--primary-color);
+}
+
+/* Category highlighting for days with events */
+.calendar-day.has-event { position: relative; }
+.calendar-day.has-event.primary { background: color-mix(in srgb, var(--primary-color) 18%, #ffffff); }
+.calendar-day.has-event.secondary { background: color-mix(in srgb, var(--secondary-color) 18%, #ffffff); }
+.calendar-day.has-event.success { background: color-mix(in srgb, var(--success-color) 18%, #ffffff); }
+.calendar-day.has-event.accent { background: color-mix(in srgb, var(--accent-color) 18%, #ffffff); }
+.calendar-day.has-event.purple { background: color-mix(in srgb, var(--purple-color) 18%, #ffffff); }
+.calendar-day.has-event.orange { background: color-mix(in srgb, var(--orange-color) 18%, #ffffff); }
+
+/* Fallback for browsers without color-mix */
+@supports not (background: color-mix(in srgb, white, black)) {
+    .calendar-day.has-event.primary { background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-color) 10%, #fff 10%); }
+    .calendar-day.has-event.secondary { background: linear-gradient(180deg, var(--secondary-color) 0%, var(--secondary-color) 10%, #fff 10%); }
+    .calendar-day.has-event.success { background: linear-gradient(180deg, var(--success-color) 0%, var(--success-color) 10%, #fff 10%); }
+    .calendar-day.has-event.accent { background: linear-gradient(180deg, var(--accent-color) 0%, var(--accent-color) 10%, #fff 10%); }
+    .calendar-day.has-event.purple { background: linear-gradient(180deg, var(--purple-color) 0%, var(--purple-color) 10%, #fff 10%); }
+    .calendar-day.has-event.orange { background: linear-gradient(180deg, var(--orange-color) 0%, var(--orange-color) 10%, #fff 10%); }
+}
+
+/* Multi-event color bar */
+.event-bar { position:absolute; top:0; left:0; right:0; height:6px; display:flex; overflow:hidden; border-radius:2px 2px 0 0; }
+.event-bar-segment { flex:1; }
+.event-bar-segment.primary { background: var(--primary-color); }
+.event-bar-segment.secondary { background: var(--secondary-color); }
+.event-bar-segment.success { background: var(--success-color); }
+.event-bar-segment.accent { background: var(--accent-color); }
+.event-bar-segment.purple { background: var(--purple-color); }
+.event-bar-segment.orange { background: var(--orange-color); }
+
+.day-number {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
+}
+
+.calendar-day.other-month .day-number {
+    color: #ccc;
+}
+
+.calendar-day.today .day-number {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.event-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 1px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.event-dot:hover {
+    transform: scale(1.3);
+}
+
+.event-dot.primary { background: var(--primary-color); }
+.event-dot.secondary { background: var(--secondary-color); }
+.event-dot.success { background: var(--success-color); }
+.event-dot.accent { background: var(--accent-color); }
+.event-dot.purple { background: var(--purple-color); }
+.event-dot.orange { background: var(--orange-color); }
+
+.event-preview {
+    position: absolute;
+    left: -10px; /* Extended left for better visibility */
+    right: -10px; /* Extended right for better visibility */
+    background: white;
+    border: 2px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    z-index: 99999; /* Maximum z-index to ensure it's always on top */
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3); /* Even stronger shadow */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease; /* Smoother transition */
+    max-width: 320px;
+    max-height: 280px; /* Increased height */
+    overflow-y: auto;
+    /* Ensure it's always on top */
+    position: fixed; /* Changed to fixed for better control */
+    pointer-events: auto; /* Ensure mouse events work */
+    /* Add a subtle border gap effect */
+    margin-top: -2px; /* Reduce gap between day and preview */
+}
+
+/* Default position: below the day */
+.calendar-day .event-preview {
+    /* Position will be set dynamically by JavaScript */
+}
+
+/* If in bottom row, position above the day */
+.calendar-day.bottom-row .event-preview {
+    /* Position will be set dynamically by JavaScript */
+}
+
+.calendar-day.bottom-row:hover .event-preview {
+    transform: translateY(0);
+}
+
+.calendar-day:hover .event-preview {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Enhanced event preview styling */
+.event-preview .event-item-preview {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.event-preview .event-item-preview:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.event-preview h6 {
+    color: var(--primary-color) !important;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.event-preview .btn {
+    position: relative;
+    z-index: 10000;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+}
+
+/* Tooltip popup for better mobile/edge experience */
+.event-tooltip {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    max-width: 250px;
+    word-wrap: break-word;
+}
+
+/* Ensure section allows overflow for preview */
+.section {
+    position: relative;
+    z-index: 1;
+}
+
+/* Calendar day hover states for better visibility */
+.calendar-day:hover {
+    position: relative;
+    z-index: 1001 !important;
+}
+
+/* Events list and other content should have lower z-index */
+.events-list {
+    position: relative;
+    z-index: 1;
+}
+
+.legend {
+    position: relative;
+    z-index: 0; /* Much lower to ensure previews are always on top */
+}
+
+.event-preview h6 {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.event-preview p {
+    font-size: 0.8rem;
+    color: var(--gray-color);
+    margin-bottom: 0.3rem;
+}
+
+.events-list {
+    margin-top: 2rem;
+    position: relative;
+    z-index: 1; /* Low z-index so previews can appear above */
+}
+
+.event-item {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--primary-color);
+    transition: var(--transition);
+    position: relative;
+    z-index: 1; /* Low z-index so previews can appear above */
+}
+
+.event-item:hover {
+    transform: translateX(5px);
+    box-shadow: var(--box-shadow-hover);
+}
+
+.legend {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: var(--border-radius);
+    position: relative;
+    z-index: 0; /* Much lower so previews can appear above */
+}
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    margin: 0.5rem 1rem 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-3">Veranstaltungen</h1>
+                <p class="lead">Finden Sie unsere interkulturellen Veranstaltungen im Kalender</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Calendar Section -->
+<section class="section" style="overflow: visible; position: relative; z-index: 1;">
+    <div class="container" style="overflow: visible; position: relative;">
+        <div class="calendar-container">
+            <!-- Calendar Header -->
+            <div class="calendar-header">
+                <div class="month-navigation">
+                    <a href="?year={{ prev_year }}&month={{ prev_month }}" class="nav-arrow">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    <h2 class="mb-0">{{ current_month_name }} {{ current_year }}</h2>
+                    <a href="?year={{ next_year }}&month={{ next_month }}" class="nav-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div class="calendar-grid">
+                <!-- Day Headers -->
+                {% for day_name in day_names %}
+                    <div class="calendar-day-header">{{ day_name }}</div>
+                {% endfor %}
+
+                <!-- Calendar Days -->
+                {% for week in month_days %}
+                    {% for day in week %}
+                        {% with day_events=events_by_day|get_item:day %}
+                        <div class="calendar-day{% if day == 0 %} other-month{% endif %}{% if day == today.day and current_month == today.month and current_year == today.year %} today{% endif %}{% if day_events %} has-event {{ day_events.0.category }}{% endif %}">
+                            {% if day != 0 %}
+                                <div class="day-number">{{ day }}</div>
+                                {% if day_events %}
+                                    <!-- Multi category bar (shows all event categories that day) -->
+                                    <div class="event-bar">
+                                        {% for ev in day_events %}
+                                            <span class="event-bar-segment {{ ev.category }}" 
+                                                  title="{{ ev.title|default:'Veranstaltung' }} - {{ ev.date|date:'H:i' }} - {{ ev.location|default:'Ort TBA' }}"
+                                                  data-bs-toggle="tooltip" 
+                                                  data-bs-placement="top"></span>
+                                        {% endfor %}
+                                    </div>
+                                    <!-- Dots retained for accessibility / hover targets -->
+                                    <div class="events-dots" style="margin-top:4px;">
+                                        {% for event in day_events %}
+                                            <span class="event-dot {{ event.category }}" 
+                                                  title="{{ event.title|default:'Veranstaltung' }} - {{ event.date|date:'H:i' }} - {{ event.location|default:'Ort TBA' }}"
+                                                  data-bs-toggle="tooltip" 
+                                                  data-bs-placement="top"></span>
+                                        {% endfor %}
+                                    </div>
+                                    <!-- Event Preview -->
+                                    <div class="event-preview">
+                                        {% for event in day_events %}
+                                            <div class="event-item-preview">
+                                                <h6>{{ event.title|default:'Veranstaltung' }}</h6>
+                                                <p><i class="fas fa-clock me-1"></i>{{ event.date|date:"H:i" }}</p>
+                                                <p><i class="fas fa-map-marker-alt me-1"></i>{{ event.location|default:'Ort wird noch bekannt gegeben' }}</p>
+                                                {% if event.description %}
+                                                    <p class="small">{{ event.description|truncatewords:10 }}</p>
+                                                {% endif %}
+                                                <a href="{% url 'event_detail' event.pk %}" class="btn btn-primary btn-sm">Details</a>
+                                                {% if not forloop.last %}<hr class="my-2">{% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        {% endwith %}
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <h5 class="mb-3"><i class="fas fa-info-circle me-2"></i>Legende</h5>
+            <div class="legend-item">
+                <span class="legend-dot" style="background: var(--primary-color);"></span>
+                Kulturelle Veranstaltungen
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot" style="background: var(--secondary-color);"></span>
+                Workshops & Seminare
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot" style="background: var(--success-color);"></span>
+                Integrationsprojekte
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot" style="background: var(--accent-color);"></span>
+                Sprachkurse
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot" style="background: var(--purple-color);"></span>
+                Begegnungen
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot" style="background: var(--orange-color);"></span>
+                Feste & Feiern
+            </div>
+        </div>
+
+        <!-- Events List for Current Month -->
+        {% if events_by_day %}
+        <div class="events-list">
+            <h3 class="mb-4">Veranstaltungen im {{ current_month_name }} {{ current_year }}</h3>
+            {% for day, day_events in events_by_day.items %}
+                {% for event in day_events %}
+                <div class="event-item">
+                    <div class="row align-items-center">
+                        <div class="col-md-2 text-center">
+                            <div class="text-primary fw-bold fs-4">{{ day }}</div>
+                            <div class="small text-muted">{{ current_month_name }}</div>
+                            <div class="small text-primary">{{ event.date|date:"H:i" }}</div>
+                        </div>
+                        <div class="col-md-7">
+                            <h5 class="mb-1">{{ event.title }}</h5>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}
+                            </p>
+                            <p class="mb-0">{{ event.description|truncatewords:20 }}</p>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <a href="{% url 'event_detail' event.pk %}" class="btn btn-primary">
+                                Details anzeigen
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times fa-4x text-muted mb-4"></i>
+            <h3 class="text-muted">Keine Veranstaltungen im {{ current_month_name }}</h3>
+            <p class="text-muted">Schauen Sie in anderen Monaten nach kommenden Veranstaltungen.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Create dynamic tooltip element
+    const tooltip = document.createElement('div');
+    tooltip.className = 'event-tooltip';
+    document.body.appendChild(tooltip);
+
+    // Initialize Bootstrap tooltips for all elements with title attribute
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            placement: 'top',
+            trigger: 'hover focus',
+            delay: { show: 300, hide: 100 }
+        });
+    });
+
+    // Detect bottom row days for smart positioning
+    const calendarGrid = document.querySelector('.calendar-grid');
+    const calendarDays = document.querySelectorAll('.calendar-day');
+    const totalDays = calendarDays.length;
+    const daysPerWeek = 7;
+    const headerRows = 1; // Day headers
+    
+    // Mark bottom row days
+    calendarDays.forEach((day, index) => {
+        // Calculate which row this day is in (excluding header)
+        const dayIndex = index - daysPerWeek; // Subtract header row
+        if (dayIndex >= 0) {
+            const rowNumber = Math.floor(dayIndex / daysPerWeek);
+            const totalRows = Math.ceil((totalDays - daysPerWeek) / daysPerWeek);
+            
+            // If it's the last two rows, use smart positioning
+            if (rowNumber >= totalRows - 2) {
+                day.classList.add('bottom-row');
+            }
+        }
+    });
+    
+    // Enhanced hover preview functionality with smart positioning and improved UX
+    calendarDays.forEach(day => {
+        const preview = day.querySelector('.event-preview');
+        if (preview) {
+            let hoverTimeout;
+            let hideTimeout;
+            let isHovering = false;
+            let isPreviewHovering = false;
+            
+            day.addEventListener('mouseenter', function() {
+                isHovering = true;
+                clearTimeout(hoverTimeout);
+                clearTimeout(hideTimeout);
+                hoverTimeout = setTimeout(() => {
+                    if (isHovering || isPreviewHovering) {
+                        showPreview();
+                    }
+                }, 100);
+            });
+            
+            day.addEventListener('mouseleave', function() {
+                isHovering = false;
+                clearTimeout(hoverTimeout);
+                
+                // For top row days, use longer delay
+                const rect = day.getBoundingClientRect();
+                const isTopRow = rect.top < 200; // Days in top part of calendar
+                const delayTime = isTopRow ? 800 : 300; // Much longer delay for top rows
+                
+                console.log('Mouse leaving day, isTopRow:', isTopRow, 'delay:', delayTime);
+                
+                // Add delay before hiding to allow mouse movement to preview
+                hideTimeout = setTimeout(() => {
+                    console.log('Timeout triggered, isHovering:', isHovering, 'isPreviewHovering:', isPreviewHovering);
+                    if (!isHovering && !isPreviewHovering) {
+                        hidePreview();
+                    }
+                }, delayTime);
+            });
+
+            // Keep preview visible when hovering over the preview itself
+            preview.addEventListener('mouseenter', function() {
+                isPreviewHovering = true;
+                clearTimeout(hideTimeout);
+            });
+
+            preview.addEventListener('mouseleave', function() {
+                isPreviewHovering = false;
+                
+                // For top row days, use longer delay even when leaving preview
+                const rect = day.getBoundingClientRect();
+                const isTopRow = rect.top < 200;
+                const delayTime = isTopRow ? 500 : 150; // Longer delay for top rows
+                
+                console.log('Mouse leaving preview, isTopRow:', isTopRow, 'delay:', delayTime);
+                
+                // Shorter delay when leaving preview
+                hideTimeout = setTimeout(() => {
+                    console.log('Preview timeout triggered, isHovering:', isHovering, 'isPreviewHovering:', isPreviewHovering);
+                    if (!isHovering && !isPreviewHovering) {
+                        hidePreview();
+                    }
+                }, delayTime);
+            });
+            
+            function showPreview() {
+                // Calculate position for fixed positioning
+                const rect = day.getBoundingClientRect();
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+                
+                const viewportHeight = window.innerHeight;
+                const spaceBelow = viewportHeight - rect.bottom;
+                const spaceAbove = rect.top;
+                const previewHeight = 290; // Estimated preview height
+                
+                // Debug logging for troubleshooting
+                console.log('Day position:', {
+                    top: rect.top, 
+                    bottom: rect.bottom, 
+                    spaceAbove, 
+                    spaceBelow, 
+                    viewportHeight,
+                    previewHeight
+                });
+                
+                let top, left;
+                
+                // Improved positioning logic - prevent viewport overflow
+                if (spaceBelow < previewHeight && spaceAbove > previewHeight) {
+                    // Position above - but ensure it doesn't go above viewport
+                    top = Math.max(20, rect.top + scrollTop - previewHeight); // Minimum 20px from top
+                    day.classList.add('bottom-row');
+                    console.log('Positioning above, calculated top:', top);
+                } else if (spaceAbove < 100) {
+                    // If very close to top, force position below
+                    top = rect.bottom + scrollTop + 5;
+                    day.classList.remove('bottom-row');
+                    console.log('Close to top, positioning below, calculated top:', top);
+                } else {
+                    // Position below - with smaller gap
+                    top = rect.bottom + scrollTop + 5;
+                    day.classList.remove('bottom-row');
+                    console.log('Default positioning below, calculated top:', top);
+                }
+                
+                // For very bottom rows, force positioning above but within viewport
+                const calendarBottom = document.querySelector('.calendar-grid').getBoundingClientRect().bottom;
+                if (rect.bottom > calendarBottom - 150) {
+                    top = Math.max(20, rect.top + scrollTop - previewHeight);
+                    day.classList.add('bottom-row');
+                    console.log('Bottom row adjustment, new top:', top);
+                }
+                
+                // Ensure preview doesn't go below viewport
+                const maxTop = scrollTop + viewportHeight - previewHeight - 20;
+                if (top > maxTop) {
+                    top = maxTop;
+                    console.log('Viewport bottom adjustment, new top:', top);
+                }
+                
+                // Center horizontally relative to the day
+                left = rect.left + scrollLeft - ((320 - rect.width) / 2);
+                
+                // Ensure preview stays within viewport horizontally
+                if (left < 10) left = 10;
+                if (left + 320 > window.innerWidth - 10) {
+                    left = window.innerWidth - 330;
+                }
+                
+                // Apply positioning
+                preview.style.position = 'fixed';
+                preview.style.top = (top - scrollTop) + 'px';
+                preview.style.left = left + 'px';
+                preview.style.width = '300px';
+                preview.style.opacity = '1';
+                preview.style.visibility = 'visible';
+                preview.style.transform = 'translateY(0)';
+                preview.style.zIndex = '99999'; // Maximum z-index
+                
+                // Create invisible bridge area for better mouse movement
+                createInvisibleBridge(day, preview, rect);
+            }
+            
+            function createInvisibleBridge(day, preview, dayRect) {
+                // Remove any existing bridge
+                const existingBridge = document.querySelector('.hover-bridge');
+                if (existingBridge) {
+                    existingBridge.remove();
+                }
+                
+                // Wait for preview to be positioned, then create bridge
+                setTimeout(() => {
+                    const bridge = document.createElement('div');
+                    bridge.className = 'hover-bridge';
+                    bridge.style.cssText = `
+                        position: fixed;
+                        background: ${isTopRow ? 'rgba(255, 0, 0, 0.1)' : 'rgba(0, 255, 0, 0.1)'};
+                        pointer-events: auto;
+                        z-index: 99998;
+                        opacity: 0.3;
+                        border: 2px solid ${isTopRow ? 'red' : 'green'};
+                    `;
+                    
+                    // Get actual preview position after it's been positioned
+                    const previewRect = preview.getBoundingClientRect();
+                    
+                    // For top rows, make bridge much larger
+                    const dayRect = day.getBoundingClientRect();
+                    const isTopRow = dayRect.top < 200;
+                    const padding = isTopRow ? 30 : 10; // Much larger padding for top rows
+                    
+                    console.log('Creating bridge, isTopRow:', isTopRow, 'padding:', padding);
+                    
+                    // Ensure bridge doesn't go outside viewport
+                    const bridgeLeft = Math.max(0, Math.min(dayRect.left, previewRect.left) - padding);
+                    const bridgeTop = Math.max(0, Math.min(dayRect.top, previewRect.top) - padding);
+                    const bridgeRight = Math.min(window.innerWidth, Math.max(dayRect.right, previewRect.right) + padding);
+                    const bridgeBottom = Math.min(window.innerHeight, Math.max(dayRect.bottom, previewRect.bottom) + padding);
+                    
+                    const bridgeWidth = bridgeRight - bridgeLeft;
+                    const bridgeHeight = bridgeBottom - bridgeTop;
+                    
+                    bridge.style.left = bridgeLeft + 'px';
+                    bridge.style.top = bridgeTop + 'px';
+                    bridge.style.width = bridgeWidth + 'px';
+                    bridge.style.height = bridgeHeight + 'px';
+                    
+                    // Add bridge event listeners
+                    bridge.addEventListener('mouseenter', () => {
+                        isHovering = true;
+                        isPreviewHovering = true;
+                        clearTimeout(hideTimeout);
+                    });
+                    
+                    bridge.addEventListener('mouseleave', () => {
+                        isHovering = false;
+                        isPreviewHovering = false;
+                        hideTimeout = setTimeout(() => {
+                            if (!isHovering && !isPreviewHovering) {
+                                hidePreview();
+                                bridge.remove();
+                            }
+                        }, 150);
+                    });
+                    
+                    document.body.appendChild(bridge);
+                }, 50); // Small delay to ensure preview is positioned
+            }
+            
+            function hidePreview() {
+                preview.style.opacity = '0';
+                preview.style.visibility = 'hidden';
+                preview.style.transform = 'translateY(-10px)';
+                
+                // Remove bridge
+                const bridge = document.querySelector('.hover-bridge');
+                if (bridge) {
+                    bridge.remove();
+                }
+                
+                setTimeout(() => {
+                    if (preview.style.opacity === '0') {
+                        preview.style.position = 'absolute';
+                    }
+                }, 300);
+            }
+        }
+    });
+
+    // Dynamic tooltip for event dots and bars
+    function showTooltip(e, text) {
+        tooltip.textContent = text;
+        tooltip.style.opacity = '1';
+        updateTooltipPosition(e);
+    }
+
+    function hideTooltip() {
+        tooltip.style.opacity = '0';
+    }
+
+    function updateTooltipPosition(e) {
+        const x = e.clientX;
+        const y = e.clientY;
+        const tooltipRect = tooltip.getBoundingClientRect();
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        // Position tooltip
+        let left = x + 10;
+        let top = y - tooltipRect.height - 10;
+
+        // Adjust if tooltip goes off screen
+        if (left + tooltipRect.width > windowWidth) {
+            left = x - tooltipRect.width - 10;
+        }
+        if (top < 0) {
+            top = y + 20;
+        }
+        if (top + tooltipRect.height > windowHeight) {
+            top = windowHeight - tooltipRect.height - 10;
+        }
+
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+    }
+
+    // Add dynamic tooltip to event elements
+    const eventElements = document.querySelectorAll('.event-dot, .event-bar-segment');
+    eventElements.forEach(element => {
+        element.addEventListener('mouseenter', function(e) {
+            const title = this.getAttribute('title');
+            if (title) {
+                showTooltip(e, title);
+            }
+        });
+
+        element.addEventListener('mousemove', function(e) {
+            if (tooltip.style.opacity === '1') {
+                updateTooltipPosition(e);
+            }
+        });
+
+        element.addEventListener('mouseleave', function() {
+            hideTooltip();
+        });
+    });
+
+    // Debug: Log events data
+    console.log('Calendar events loaded with smart positioning');
+    const eventDots = document.querySelectorAll('.event-dot');
+    console.log(`Found ${eventDots.length} event dots`);
+    
+    // Fallback for missing tooltips
+    const allEventElements = document.querySelectorAll('.event-dot, .event-bar-segment');
+    allEventElements.forEach(element => {
+        if (!element.getAttribute('title')) {
+            const day = element.closest('.calendar-day');
+            const dayNumber = day.querySelector('.day-number')?.textContent;
+            const monthName = '{{ current_month_name }}';
+            element.setAttribute('title', `Veranstaltung am ${dayNumber}. ${monthName}`);
+        }
+    });
+});
+</script>
+{% endblock %}

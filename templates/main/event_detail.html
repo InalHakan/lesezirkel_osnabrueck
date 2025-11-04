@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ event.title }} - Lesezirkel Osnabrück e.V.{% endblock %}
+
+{% block content %}
+<!-- Event Detail -->
+<section class="section" style="padding-top: 100px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                {% if event.image %}
+                    <img src="{{ event.image.url }}" alt="{{ event.title }}" class="img-fluid rounded shadow mb-4">
+                {% endif %}
+                
+                <h1 class="mb-3">{{ event.title }}</h1>
+                
+                <div class="event-meta mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="text-primary fw-bold mb-2">
+                                <i class="fas fa-calendar me-2"></i>
+                                {{ event.date|date:"d F Y, H:i" }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                {{ event.location }}
+                            </p>
+                        </div>
+                        {% if not event.is_public %}
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-lock me-2"></i>
+                                Diese Veranstaltung ist nur für Vereinsmitglieder und geladene Gäste.
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if event.max_participants %}
+                        <div class="col-12">
+                            <p class="text-info mb-2">
+                                <i class="fas fa-users me-2"></i>
+                                Verfügbare Plätze: {{ event.max_participants|add:"-"|add:current_registrations }} von {{ event.max_participants }}
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="event-description">
+                    <p class="lead">{{ event.description|linebreaks }}</p>
+                </div>
+                
+                <div class="d-flex gap-3 mt-4">
+                    <a href="{% url 'events' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Zurück zu Veranstaltungen
+                    </a>
+                    {% if not event.registration_required %}
+                    <a href="{% url 'contact' %}" class="btn btn-primary">
+                        <i class="fas fa-envelope me-2"></i>Kontakt für Teilnahme
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Event Registration Form -->
+                {% if event.registration_required and event.is_public %}
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-user-plus text-primary me-2"></i>
+                            Anmeldung zur Veranstaltung
+                        </h5>
+                        
+                        {% if event.max_participants and current_registrations >= event.max_participants %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Diese Veranstaltung ist ausgebucht.
+                            </div>
+                        {% else %}
+                        <form method="post" class="mt-3">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="first_name" class="form-label">Vorname *</label>
+                                    <input type="text" class="form-control" id="first_name" name="first_name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="last_name" class="form-label">Nachname *</label>
+                                    <input type="text" class="form-control" id="last_name" name="last_name" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">E-Mail *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Telefon</label>
+                                <input type="tel" class="form-control" id="phone" name="phone">
+                            </div>
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Anmerkungen</label>
+                                <textarea class="form-control" id="message" name="message" rows="3"></textarea>
+                            </div>
+                            
+                            <!-- Privacy Consent -->
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="privacy_consent" name="privacy_consent" required>
+                                    <label class="form-check-label" for="privacy_consent">
+                                        Ich habe die <a href="{% url 'privacy' %}" target="_blank">Datenschutzerklärung</a> gelesen und stimme zu. *
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Newsletter Consent -->
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="newsletter_consent" name="newsletter_consent">
+                                    <label class="form-check-label" for="newsletter_consent">
+                                        Ich möchte den Newsletter erhalten.
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Photo Consent -->
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="photo_consent" name="photo_consent">
+                                    <label class="form-check-label" for="photo_consent">
+                                        <i class="fas fa-camera text-primary me-1"></i>
+                                        Ich erlaube das Fotografieren und die Veröffentlichung von Fotos, auf denen ich zu sehen bin.
+                                    </label>
+                                </div>
+                                <small class="text-muted">
+                                    Die Fotos können auf unserer Website, in sozialen Medien und in Veröffentlichungen des Vereins verwendet werden.
+                                </small>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-paper-plane me-2"></i>Anmeldung absenden
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Related Events -->
+                {% if related_events %}
+                <div class="card shadow border-0">
+                    <div class="card-body">
+                        <h5 class="card-title">Weitere Veranstaltungen</h5>
+                        {% for related_event in related_events %}
+                        <div class="d-flex mb-3">
+                            {% if related_event.image %}
+                                <img src="{{ related_event.image.url }}" alt="{{ related_event.title }}" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-primary rounded me-3 d-flex align-items-center justify-content-center text-white" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h6 class="mb-1">
+                                    <a href="{% url 'event_detail' related_event.pk %}" class="text-decoration-none">
+                                        {{ related_event.title|truncatechars:30 }}
+                                    </a>
+                                </h6>
+                                <small class="text-muted">{{ related_event.date|date:"d M Y" }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
