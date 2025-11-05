@@ -43,7 +43,7 @@
             <div class="col-lg-4">
                 {% if recent_gallery %}
                 <div class="hero-gallery-section">
-                    <div id="heroGalleryCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="6000">
+                    <div id="heroGalleryCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="8000">
                         <div class="carousel-inner">
                             {% for item in recent_gallery|slice:":6" %}
                             <div class="carousel-item {% if forloop.first %}active{% endif %}">
@@ -59,6 +59,16 @@
                             </div>
                             {% endfor %}
                         </div>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Fallback: Show Logo if no gallery images -->
+                <div class="hero-gallery-section">
+                    <div class="gallery-placeholder">
+                        <img src="{% static 'images/logo.png' %}" alt="Lesezirkel Osnabrück Logo" class="hero-logo-placeholder">
+                        <p class="text-light text-center mt-3 opacity-75">
+                            Fotogalerie wird bald verfügbar sein
+                        </p>
                     </div>
                 </div>
                 {% endif %}

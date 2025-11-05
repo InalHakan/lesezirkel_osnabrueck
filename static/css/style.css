@@ -249,6 +249,39 @@ body {
     padding: 1rem;
 }
 
+/* Gallery Placeholder (when no images) */
+.gallery-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    min-height: 450px;
+}
+
+.hero-logo-placeholder {
+    max-width: 350px;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 10px 30px rgba(255, 255, 255, 0.3));
+    animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-15px) scale(1.05);
+    }
+}
+
+.gallery-placeholder p {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-top: 1.5rem;
+}
+
 .gallery-reflection-container {
     position: relative;
     display: inline-block;
@@ -312,6 +345,149 @@ body {
 
 #heroGalleryCarousel .carousel-inner {
     border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+/* Multiple Carousel Transition Effects */
+#heroGalleryCarousel .carousel-item {
+    transition-duration: 2s;
+    transition-timing-function: ease-in-out;
+}
+
+/* 1. Fade Effect (Default) */
+.carousel-fade .carousel-item {
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+}
+
+.carousel-fade .carousel-item.active,
+.carousel-fade .carousel-item-next.carousel-item-start,
+.carousel-fade .carousel-item-prev.carousel-item-end {
+    opacity: 1;
+}
+
+.carousel-fade .carousel-item-next,
+.carousel-fade .carousel-item-prev,
+.carousel-fade .carousel-item.active.carousel-item-start,
+.carousel-fade .carousel-item.active.carousel-item-end {
+    transform: none;
+}
+
+/* 2. Slide Effect */
+.carousel-slide .carousel-item-next,
+.carousel-slide .carousel-item-prev {
+    position: absolute;
+    top: 0;
+}
+
+.carousel-slide .carousel-item-next {
+    transform: translateX(100%);
+}
+
+.carousel-slide .carousel-item-prev {
+    transform: translateX(-100%);
+}
+
+.carousel-slide .carousel-item-next.carousel-item-start,
+.carousel-slide .carousel-item-prev.carousel-item-end {
+    transform: translateX(0);
+}
+
+.carousel-slide .carousel-item.active.carousel-item-end {
+    transform: translateX(-100%);
+}
+
+.carousel-slide .carousel-item.active.carousel-item-start {
+    transform: translateX(100%);
+}
+
+/* 3. Zoom Effect */
+.carousel-zoom .carousel-item {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 2s ease-in-out, transform 2s ease-in-out;
+}
+
+.carousel-zoom .carousel-item.active,
+.carousel-zoom .carousel-item-next.carousel-item-start,
+.carousel-zoom .carousel-item-prev.carousel-item-end {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* 4. Checkerboard Effect (Damalı) */
+.carousel-checkerboard .carousel-item {
+    position: relative;
+}
+
+.carousel-checkerboard .carousel-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 50px,
+            rgba(255, 255, 255, 0.9) 50px,
+            rgba(255, 255, 255, 0.9) 100px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 50px,
+            rgba(255, 255, 255, 0.9) 50px,
+            rgba(255, 255, 255, 0.9) 100px
+        );
+    opacity: 1;
+    transition: opacity 2s ease-in-out;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.carousel-checkerboard .carousel-item.active::before {
+    opacity: 0;
+}
+
+/* 5. Flip Effect (3D) */
+.carousel-flip {
+    perspective: 1000px;
+}
+
+.carousel-flip .carousel-item {
+    transform-style: preserve-3d;
+    opacity: 0;
+}
+
+.carousel-flip .carousel-item-next {
+    transform: rotateY(90deg);
+}
+
+.carousel-flip .carousel-item-prev {
+    transform: rotateY(-90deg);
+}
+
+.carousel-flip .carousel-item-next.carousel-item-start,
+.carousel-flip .carousel-item-prev.carousel-item-end {
+    transform: rotateY(0);
+    opacity: 1;
+}
+
+.carousel-flip .carousel-item.active.carousel-item-end {
+    transform: rotateY(-90deg);
+    opacity: 0;
+}
+
+.carousel-flip .carousel-item.active.carousel-item-start {
+    transform: rotateY(90deg);
+    opacity: 0;
+}
+
+.carousel-flip .carousel-item.active {
+    opacity: 1;
 }
 
 /* Handwriting Caption for Gallery */
@@ -1038,6 +1214,15 @@ footer {
     .hero-gallery-section {
         margin: 2rem 0;
         padding: 1rem 0;
+    }
+    
+    .hero-logo-placeholder {
+        max-width: 250px;
+    }
+    
+    .gallery-placeholder {
+        min-height: 300px;
+        padding: 1rem;
     }
     
     .hero-gallery-img {

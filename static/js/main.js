@@ -112,6 +112,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Hero Gallery Carousel with Random Transition Effects
+    const heroCarousel = document.querySelector('#heroGalleryCarousel');
+    if (heroCarousel) {
+        const carouselElement = new bootstrap.Carousel(heroCarousel, {
+            interval: 8000, // 8 seconds - slower transitions
+            wrap: true,
+            keyboard: true
+        });
+
+        const transitionEffects = ['fade', 'slide', 'zoom', 'checkerboard', 'flip'];
+        let currentEffect = 'fade';
+
+        heroCarousel.addEventListener('slide.bs.carousel', function(e) {
+            // Remove previous effect classes
+            const items = heroCarousel.querySelectorAll('.carousel-item');
+            items.forEach(item => {
+                transitionEffects.forEach(effect => {
+                    item.classList.remove(`carousel-${effect}`);
+                });
+            });
+
+            // Select random transition effect
+            currentEffect = transitionEffects[Math.floor(Math.random() * transitionEffects.length)];
+            
+            // Apply new effect class
+            e.relatedTarget.classList.add(`carousel-${currentEffect}`);
+            e.from.classList.add(`carousel-${currentEffect}-out`);
+            
+            console.log('Transition effect:', currentEffect);
+        });
+    }
+
     // Newsletter subscription
     const newsletterForm = document.querySelector('.newsletter-form');
     if (newsletterForm) {
