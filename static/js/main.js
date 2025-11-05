@@ -2,6 +2,52 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     
+    // Improved dropdown behavior for better UX
+    const dropdowns = document.querySelectorAll('.navbar .dropdown');
+    dropdowns.forEach(dropdown => {
+        let hideTimeout;
+        
+        // Show dropdown on hover
+        dropdown.addEventListener('mouseenter', function() {
+            clearTimeout(hideTimeout);
+            const menu = this.querySelector('.dropdown-menu');
+            if (menu) {
+                menu.classList.add('show');
+            }
+        });
+        
+        // Hide dropdown with delay when mouse leaves
+        dropdown.addEventListener('mouseleave', function() {
+            const menu = this.querySelector('.dropdown-menu');
+            hideTimeout = setTimeout(() => {
+                if (menu) {
+                    menu.classList.remove('show');
+                }
+            }, 200); // 200ms delay before hiding
+        });
+        
+        // Also support click for mobile/touch devices
+        const toggle = dropdown.querySelector('.dropdown-toggle');
+        if (toggle) {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                const menu = dropdown.querySelector('.dropdown-menu');
+                if (menu) {
+                    menu.classList.toggle('show');
+                }
+            });
+        }
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown')) {
+            document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+    });
+    
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {

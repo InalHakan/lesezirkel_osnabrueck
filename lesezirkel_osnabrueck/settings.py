@@ -32,6 +32,7 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,test
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',  # Must be before django.contrib.admin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -192,3 +193,128 @@ LOGGING = {
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/events/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Jazzmin Admin Theme Configuration
+JAZZMIN_SETTINGS = {
+    # Title on the login screen and header
+    "site_title": "Lesezirkel Osnabrück Admin",
+    "site_header": "Lesezirkel Osnabrück e.V.",
+    "site_brand": "Lesezirkel der Friedensstadt Osnabrück",
+    
+    # Logo to use for your site (path relative to STATIC_URL)
+    "site_logo": "images/logo.png",
+    "login_logo": "images/logo.png",
+    
+    # Logo to use for login form in dark themes
+    "login_logo_dark": None,
+    
+    # CSS classes to add to site logo
+    "site_logo_classes": "img-circle",
+    
+    # Relative path to a favicon
+    "site_icon": None,
+    
+    # Welcome text on the login screen
+    "welcome_sign": "Willkommen im Admin-Bereich",
+    
+    # Copyright on the footer
+    "copyright": "Lesezirkel Osnabrück e.V. 2025",
+    
+    # The model admin to search from the search bar
+    "search_model": ["auth.User", "main.Event", "main.News"],
+    
+    # Field name on user model that contains avatar image
+    "user_avatar": None,
+    
+    ############
+    # Top Menu #
+    ############
+    
+    # Links to put along the top menu
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Website", "url": "/", "new_window": True},
+        {"model": "auth.User"},
+        {"app": "main"},
+    ],
+    
+    #############
+    # Side Menu #
+    #############
+    
+    # Whether to display the side menu
+    "show_sidebar": True,
+    
+    # Whether to aut expand the menu
+    "navigation_expanded": True,
+    
+    # Custom icons for side menu apps/models
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "main.Event": "fas fa-calendar-alt",
+        "main.News": "fas fa-newspaper",
+        "main.TeamMember": "fas fa-user-tie",
+        "main.Gallery": "fas fa-images",
+        "main.Contact": "fas fa-envelope",
+        "main.EventRegistration": "fas fa-user-check",
+        "main.Document": "fas fa-file-alt",
+        "main.Certificate": "fas fa-certificate",
+    },
+    
+    # Icons that are used when one is not manually specified
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+    
+    #################
+    # Related Modal #
+    #################
+    "related_modal_active": False,
+    
+    #############
+    # UI Tweaks #
+    #############
+    
+    # Render out the change view as a single form, or in tabs
+    "changeform_format": "horizontal_tabs",
+    
+    # Override change forms on a per modeladmin basis
+    "changeform_format_overrides": {
+        "auth.user": "collapsible",
+        "auth.group": "vertical_tabs",
+    },
+}
+
+# Jazzmin UI Tweaks
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-primary",
+    "accent": "accent-primary",
+    "navbar": "navbar-white navbar-light",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success",
+    },
+}

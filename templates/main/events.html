@@ -86,8 +86,28 @@
 }
 
 .calendar-day.today {
-    background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(231, 76, 60, 0.1));
-    border: 2px solid var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+    color: white !important;
+    font-weight: 700 !important;
+    border: 3px solid var(--secondary-color) !important;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.4) !important;
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+/* Make sure all text in today's cell is white */
+.calendar-day.today * {
+    color: white !important;
+}
+
+.calendar-day.today strong {
+    color: white !important;
+    font-weight: 700 !important;
+}
+
+.calendar-day.today:hover {
+    transform: scale(1.08) !important;
+    box-shadow: 0 6px 20px rgba(30, 58, 138, 0.5) !important;
 }
 
 /* Category highlighting for days with events */
@@ -98,6 +118,17 @@
 .calendar-day.has-event.accent { background: color-mix(in srgb, var(--accent-color) 18%, #ffffff); }
 .calendar-day.has-event.purple { background: color-mix(in srgb, var(--purple-color) 18%, #ffffff); }
 .calendar-day.has-event.orange { background: color-mix(in srgb, var(--orange-color) 18%, #ffffff); }
+
+/* Today with event - special styling */
+.calendar-day.today.has-event {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+    color: white !important;
+}
+
+.calendar-day.today.has-event .event-bar {
+    opacity: 0.8;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+}
 
 /* Fallback for browsers without color-mix */
 @supports not (background: color-mix(in srgb, white, black)) {

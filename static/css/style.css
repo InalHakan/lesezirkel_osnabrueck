@@ -74,7 +74,11 @@ body {
     box-shadow: var(--box-shadow-hover);
     border-radius: var(--border-radius);
     padding: 0.5rem 0;
-    margin-top: 0.5rem;
+    margin-top: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
 }
 
 .dropdown-item {
@@ -97,8 +101,33 @@ body {
     margin-left: 0.5rem;
 }
 
-.navbar .dropdown:hover .dropdown-menu {
+/* Show dropdown on hover with delay */
+.navbar .dropdown:hover .dropdown-menu,
+.navbar .dropdown-menu:hover {
     display: block;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Show class for JavaScript control */
+.dropdown-menu.show {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* Keep dropdown open when hovering over it */
+.navbar .dropdown {
+    position: relative;
+}
+
+.navbar .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
 }
 
 /* Hero Section */

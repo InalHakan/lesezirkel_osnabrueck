@@ -1,4 +1,5 @@
 Django==5.2.6
+django-jazzmin>=3.0.0
 Pillow>=8.0.0
 psycopg2-binary>=2.8.6
 gunicorn>=20.1.0
