@@ -1,20 +1,29 @@
-# Lesezirkel Osnabrück e.V. - Website
+# Lesezirkel der Friedensstadt Osnabrück e.V. - Website
 
-Ein Django-basiertes Content Management System für den Lesezirkel Osnabrück e.V.
+Ein Django-basiertes Content Management System für den Lesezirkel der Friedensstadt Osnabrück e.V.
 
 ## Über das Projekt
 
-Diese Website wurde entwickelt, um die Aktivitäten des Lesezirkels Osnabrück e.V. zu präsentieren und zu verwalten. Das System ermöglicht die Verwaltung von Veranstaltungen, Nachrichten, Dokumenten und Mitgliedern.
+Diese Website wurde entwickelt, um die Aktivitäten des Lesezirkels der Friedensstadt Osnabrück e.V. zu präsentieren und zu verwalten. Das System ermöglicht die Verwaltung von Veranstaltungen, Nachrichten, Dokumenten und Zertifikaten.
 
 ## Funktionen
 
-- 📅 **Veranstaltungsmanagement**: Erstellen und verwalten von Lesungen, Diskussionsrunden und literarischen Events
+- 📅 **Veranstaltungsmanagement**: Erstellen und verwalten von Bildungsveranstaltungen und Dialogrunden
 - 📰 **Nachrichtensystem**: Aktuelle Informationen und Ankündigungen
 - 👥 **Mitgliederverwaltung**: Registration und Verwaltung von Vereinsmitgliedern
-- 📚 **Dokumentenverwaltung**: Upload und Verwaltung von Vereinsdokumenten
+- 📚 **Dokumentenverwaltung**: Upload und Verwaltung von Vereinsdokumenten mit Kategorien
+- 🏆 **Zertifikatssystem**: Download-System für Teilnahmezertifikate
 - 🖼️ **Galerie**: Fotogalerie von Veranstaltungen
 - 📝 **Kontaktformular**: Direkte Kommunikation mit dem Verein
 - 🌐 **Mehrsprachigkeit**: Unterstützung für Deutsch, Englisch und Türkisch
+
+## Design Features
+
+- **Modern Hero Section**: Mit Logo-Reflexionseffekt und Live-Etkinlik-Vorschau
+- **Responsive Design**: Optimiert für alle Geräte
+- **Glassmorphism Effects**: Moderne transparente Designelemente
+- **Blue/Navy Color Scheme**: Passend zum Vereinslogo
+- **Accessibility**: Barrierefreie Navigation und Inhalte
 
 ## Technische Details
 
@@ -35,8 +44,8 @@ Diese Website wurde entwickelt, um die Aktivitäten des Lesezirkels Osnabrück e
 
 1. Repository klonen:
 ```bash
-git clone [repository-url]
-cd Lesezirkel_Osna
+git clone https://github.com/InalHakan/lesezirkel_osnabrueck.git
+cd lesezirkel_osnabrueck
 ```
 
 2. Virtual Environment erstellen und aktivieren:
@@ -89,8 +98,15 @@ Medien-Uploads werden im `media/` Ordner gespeichert:
 - `events/` - Veranstaltungsbilder
 - `news/` - Nachrichtenbilder
 - `gallery/` - Galeriebilder
-- `documents/` - Vereinsdokumente
+- `documents/` - Vereinsdokumente (Kategorien: Formulare, Broschüren, Berichte, Zertifikate)
 - `team/` - Teamfotos
+
+## Zertifikatssystem
+
+Das System enthält ein innovatives Zertifikatssystem:
+- Teilnehmer können über Vorname, Nachname und Teilnehmernummer ihre Zertifikate suchen
+- Automatischer Download bei erfolgreicher Suche
+- Verwaltung über Django Admin Interface
 
 ## Deployment
 
@@ -98,9 +114,9 @@ Medien-Uploads werden im `media/` Ordner gespeichert:
 
 1. Gunicorn Service installieren:
 ```bash
-sudo cp gunicorn-lesezirkel.service /etc/systemd/system/
-sudo systemctl enable gunicorn-lesezirkel
-sudo systemctl start gunicorn-lesezirkel
+sudo cp gunicorn-kulturbrucke.service /etc/systemd/system/
+sudo systemctl enable gunicorn-kulturbrucke
+sudo systemctl start gunicorn-kulturbrucke
 ```
 
 2. Nginx konfigurieren:
@@ -126,6 +142,12 @@ Das Admin Interface ist unter `/admin/` erreichbar. Erstellen Sie einen Superuse
 
 Das Projekt folgt den Django-Konventionen und PEP 8 Standards.
 
+## Mission & Vision
+
+**Mission**: Der Lesezirkel der Friedensstadt Osnabrück e.V. setzt sich für eine offene, demokratische und vielfältige Gesellschaft ein. Durch Bildung, interkulturellen Dialog und ehrenamtliches Engagement schaffen wir Räume für Begegnung, Austausch und persönliche Weiterentwicklung.
+
+**Vision**: Eine lebendige und engagierte Gemeinschaft in Osnabrück, in der Bildung, Dialog und Zusammenhalt das Fundament des Miteinanders bilden.
+
 ## Beitrag
 
 Beiträge sind willkommen! Bitte erstellen Sie einen Pull Request oder öffnen Sie ein Issue für Verbesserungsvorschläge.
@@ -136,16 +158,19 @@ Dieses Projekt steht unter der MIT-Lizenz. Siehe [LICENSE](LICENSE) für Details
 
 ## Kontakt
 
-Lesezirkel Osnabrück e.V.
-- Email: info@lesezirkel-osnabrueck.de
-- Website: https://lesezirkel-osnabrueck.de
+Lesezirkel der Friedensstadt Osnabrück e.V.
+- Email: info@lz-os.de
+- Adresse: Großhandelsring 1, 49084 Osnabrück
+- Telefon: +49 (0) 15560 66 92 55
+- Bürozeiten: Dienstag & Donnerstag, 15:00 - 17:00 Uhr
 
 ## Danksagungen
 
 - Django Framework Team
 - Bootstrap Team
 - Alle Mitwirkenden des Vereins
+- EU-Förderung
 
 ---
 
-Erstellt für Lesezirkel Osnabrück e.V. - Förderung der Literatur und Gemeinschaft
+Erstellt für Lesezirkel der Friedensstadt Osnabrück e.V. - Förderung von Bildung, Dialog und Gemeinschaft
