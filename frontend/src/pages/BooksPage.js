@@ -39,12 +39,12 @@ function BooksPage() {
   };
 
   const handleDeleteBook = async (id) => {
-    if (window.confirm('Are you sure you want to delete this book?')) {
+    if (window.confirm('Möchten Sie dieses Buch wirklich löschen?')) {
       try {
         await bookService.deleteBook(id);
         fetchBooks();
       } catch (err) {
-        alert('Failed to delete book');
+        alert('Fehler beim Löschen des Buchs');
         console.error(err);
       }
     }
@@ -61,7 +61,7 @@ function BooksPage() {
       setEditingBook(null);
       fetchBooks();
     } catch (err) {
-      alert('Failed to save book');
+      alert('Fehler beim Speichern des Buchs');
       console.error(err);
     }
   };

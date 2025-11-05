@@ -44,12 +44,12 @@ function SessionsPage() {
   };
 
   const handleDeleteSession = async (id) => {
-    if (window.confirm('Are you sure you want to delete this reading session?')) {
+    if (window.confirm('Möchten Sie diesen Lesetermin wirklich löschen?')) {
       try {
         await sessionService.deleteSession(id);
         fetchData();
       } catch (err) {
-        alert('Failed to delete session');
+        alert('Fehler beim Löschen des Lesetermins');
         console.error(err);
       }
     }
@@ -66,7 +66,7 @@ function SessionsPage() {
       setEditingSession(null);
       fetchData();
     } catch (err) {
-      alert('Failed to save session');
+      alert('Fehler beim Speichern des Lesetermins');
       console.error(err);
     }
   };
