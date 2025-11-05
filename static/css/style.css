@@ -1,18 +1,18 @@
-/* KulturBrücke Ibbenbüren - Modern CSS Styles */
+/* Lesezirkel Osnabrück - Modern CSS Styles */
 
 :root {
-    --primary-color: #3498db;     /* Bright blue - matches logo */
-    --secondary-color: #e74c3c;   /* Vibrant red - puzzle piece */
-    --accent-color: #f1c40f;      /* Golden yellow - logo yellow */
-    --success-color: #2ecc71;     /* Vibrant green - puzzle piece */
-    --purple-color: #9b59b6;      /* Purple - logo purple tone */
-    --orange-color: #e67e22;      /* Orange - logo orange tone */
-    --dark-color: #2c3e50;        /* Dark gray - unchanged */
-    --light-color: #f8f9fa;       /* Light gray - unchanged */
-    --gray-color: #6c757d;        /* Medium gray - unchanged */
+    --primary-color: #1e3a8a;     /* Deep blue - matches logo */
+    --secondary-color: #3b82f6;   /* Bright blue - secondary logo color */
+    --accent-color: #1e40af;      /* Navy blue - darker accent */
+    --success-color: #10b981;     /* Green - success messages */
+    --light-blue: #60a5fa;       /* Light blue - lighter tones */
+    --dark-blue: #1e293b;        /* Very dark blue - text */
+    --dark-color: #1e293b;        /* Dark blue-gray for text */
+    --light-color: #f8fafc;       /* Very light blue-gray */
+    --gray-color: #64748b;        /* Blue-gray medium */
     --border-radius: 10px;
-    --box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    --box-shadow-hover: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    --box-shadow: 0 0.125rem 0.25rem rgba(30, 58, 138, 0.075);
+    --box-shadow-hover: 0 0.5rem 1rem rgba(30, 58, 138, 0.15);
     --transition: all 0.3s ease;
 }
 
@@ -318,7 +318,7 @@ body {
 
 .form-control:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.25);
 }
 
 .btn-primary {
@@ -331,7 +331,7 @@ body {
 }
 
 .btn-primary:hover {
-    background: #2980b9;
+    background: var(--accent-color);
     transform: translateY(-2px);
     box-shadow: var(--box-shadow-hover);
 }
