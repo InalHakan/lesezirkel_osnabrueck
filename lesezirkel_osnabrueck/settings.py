@@ -187,3 +187,8 @@ LOGGING = {
         },
     },
 }
+
+# Authentication settings
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/events/'
+LOGOUT_REDIRECT_URL = '/'

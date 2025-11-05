@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Anmeldung - Lesezirkel Osnabrück e.V.{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-3">Anmeldung</h1>
+                <p class="lead">Melden Sie sich an, um Veranstaltungen zu verwalten</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Login Form -->
+<section class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-user-circle fa-3x text-primary mb-3"></i>
+                            <h3 class="card-title">Willkommen zurück</h3>
+                            <p class="text-muted">Bitte geben Sie Ihre Anmeldedaten ein</p>
+                        </div>
+
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Fehler bei der Anmeldung:</strong>
+                                <ul class="mb-0 mt-2">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.username.id_for_label }}" class="form-label">
+                                    <i class="fas fa-envelope me-2"></i>Benutzername oder E-Mail
+                                </label>
+                                <input type="text" 
+                                       class="form-control form-control-lg{% if form.username.errors %} is-invalid{% endif %}" 
+                                       id="{{ form.username.id_for_label }}" 
+                                       name="{{ form.username.name }}" 
+                                       value="{{ form.username.value|default_if_none:'' }}"
+                                       placeholder="Ihr Benutzername oder E-Mail-Adresse"
+                                       required>
+                                {% if form.username.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.username.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="{{ form.password.id_for_label }}" class="form-label">
+                                    <i class="fas fa-lock me-2"></i>Passwort
+                                </label>
+                                <input type="password" 
+                                       class="form-control form-control-lg{% if form.password.errors %} is-invalid{% endif %}" 
+                                       id="{{ form.password.id_for_label }}" 
+                                       name="{{ form.password.name }}"
+                                       placeholder="Ihr Passwort"
+                                       required>
+                                {% if form.password.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.password.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                Anmelden
+                            </button>
+                            
+                            <input type="hidden" name="next" value="{{ next }}">
+                        </form>
+                        
+                        <div class="text-center mt-4">
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Sie benötigen Administrator-Rechte, um Veranstaltungen zu verwalten
+                            </p>
+                            <a href="{% url 'contact' %}" class="text-primary">
+                                <i class="fas fa-envelope me-1"></i>
+                                Kontakt aufnehmen für Zugang
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Help Section -->
+<section class="section bg-light-gray">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h3 class="mb-4">Hilfe bei der Anmeldung</h3>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <h5 class="feature-title">Administrator-Zugang</h5>
+                            <p class="text-muted small">
+                                Nur autorisierte Benutzer können Veranstaltungen erstellen und verwalten.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <h5 class="feature-title">E-Mail als Benutzername</h5>
+                            <p class="text-muted small">
+                                Sie können Ihre E-Mail-Adresse als Benutzername verwenden.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <h5 class="feature-title">Fragen?</h5>
+                            <p class="text-muted small">
+                                Bei Fragen zur Anmeldung kontaktieren Sie uns gerne.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Abgemeldet - Lesezirkel Osnabrück e.V.{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-3">Erfolgreich abgemeldet</h1>
+                <p class="lead">Sie wurden sicher abgemeldet</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Logout Confirmation -->
+<section class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 text-center">
+                <div class="card shadow-sm">
+                    <div class="card-body p-5">
+                        <i class="fas fa-check-circle fa-4x text-success mb-4"></i>
+                        <h3 class="card-title mb-3">Auf Wiedersehen!</h3>
+                        <p class="text-muted mb-4">
+                            Sie wurden erfolgreich abgemeldet. Vielen Dank für Ihren Besuch.
+                        </p>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <a href="{% url 'home' %}" class="btn btn-primary btn-lg me-md-2">
+                                <i class="fas fa-home me-2"></i>
+                                Zur Startseite
+                            </a>
+                            <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                Erneut anmelden
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Information Section -->
+<section class="section bg-light-gray">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h3 class="mb-4">Bleiben Sie in Verbindung</h3>
+                <p class="lead text-muted mb-4">
+                    Auch ohne Anmeldung können Sie unsere Veranstaltungen und Neuigkeiten verfolgen.
+                </p>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'events' %}" class="text-decoration-none">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-calendar"></i>
+                                </div>
+                                <h5 class="feature-title">Veranstaltungen</h5>
+                                <p class="text-muted small">
+                                    Entdecken Sie unsere kommenden Events und Termine.
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'news' %}" class="text-decoration-none">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-newspaper"></i>
+                                </div>
+                                <h5 class="feature-title">Neuigkeiten</h5>
+                                <p class="text-muted small">
+                                    Bleiben Sie über unsere Aktivitäten informiert.
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'contact' %}" class="text-decoration-none">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <h5 class="feature-title">Kontakt</h5>
+                                <p class="text-muted small">
+                                    Nehmen Sie Kontakt mit uns auf.
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

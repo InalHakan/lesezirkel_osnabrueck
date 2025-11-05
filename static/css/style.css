@@ -68,6 +68,39 @@ body {
     width: 100%;
 }
 
+/* Navigation Dropdown Styles */
+.dropdown-menu {
+    border: none;
+    box-shadow: var(--box-shadow-hover);
+    border-radius: var(--border-radius);
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
+}
+
+.dropdown-item {
+    padding: 0.75rem 1.5rem;
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+.dropdown-item:hover {
+    background-color: var(--primary-color);
+    color: white !important;
+}
+
+.dropdown-item i {
+    width: 16px;
+    text-align: center;
+}
+
+.dropdown-toggle::after {
+    margin-left: 0.5rem;
+}
+
+.navbar .dropdown:hover .dropdown-menu {
+    display: block;
+}
+
 /* Hero Section */
 .hero-section {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
@@ -219,6 +252,15 @@ body {
 
 .bg-opacity-15 {
     background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Gradient backgrounds */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+}
+
+.bg-gradient-light {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
 }
 
 @keyframes fadeInRight {
@@ -725,4 +767,41 @@ footer .text-warning {
 
 footer .text-primary {
     color: var(--primary-color) !important;
+}
+
+/* About & Vision Images */
+.about-vision-img {
+    max-height: 400px !important;
+    width: 100% !important;
+    object-fit: cover !important;
+    transition: var(--transition);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.about-vision-img:hover {
+    transform: scale(1.02);
+    box-shadow: 0 15px 40px rgba(30, 58, 138, 0.2);
+}
+
+/* Force browser cache refresh */
+.section img.about-vision-img {
+    max-height: 400px !important;
+    min-height: 300px !important;
+}
+
+/* Responsive adjustments for about/vision images */
+@media (max-width: 768px) {
+    .about-vision-img {
+        max-height: 300px !important;
+        min-height: 250px !important;
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .about-vision-img {
+        max-height: 250px !important;
+        min-height: 200px !important;
+    }
 }

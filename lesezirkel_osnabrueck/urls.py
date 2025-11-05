@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 # Ana URL yapısı (çok dilli sistem kaldırıldı)
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('', include('main.urls')),
 ]
 

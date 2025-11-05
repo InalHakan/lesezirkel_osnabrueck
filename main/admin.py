@@ -29,11 +29,13 @@ class EventAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Grundinformationen', {
-            'fields': ('title', 'description', 'date', 'location', 'image', 'category')
+            'fields': ('title', 'description', 'date', 'location', 'image', 'category'),
+            'description': 'Allgemeine Informationen über die Veranstaltung'
         }),
         ('Sichtbarkeit und Anmeldung', {
             'fields': ('is_featured', 'is_public', 'registration_required', 'max_participants'),
-            'description': 'Öffentliche Veranstaltungen benötigen Datenschutzerklärung bei Anmeldungen.'
+            'description': 'Öffentliche Veranstaltungen benötigen Datenschutzerklärung bei Anmeldungen.',
+            'classes': ('wide',)
         }),
     )
     
