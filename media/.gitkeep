@@ -1,0 +1,2 @@
+# This file ensures the media directory structure is preserved in git
+# Actual media files (uploads) are ignored via .gitignore

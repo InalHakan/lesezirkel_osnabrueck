@@ -9,66 +9,94 @@
 <section class="hero-section position-relative">
     <div class="container">
         <div class="row align-items-center">
+            <!-- Left: Title, Description & Watermark Logo -->
             <div class="col-lg-4">
-                <div class="hero-content">
+                <div class="hero-content position-relative">
                     <h1 class="hero-title">Lesezirkel der Friedensstadt Osnabrück e.V.</h1>
                     <p class="hero-subtitle">
                         Wir setzen uns für eine offene, demokratische und vielfältige Gesellschaft ein. 
                         Durch Bildung, interkulturellen Dialog und ehrenamtliches Engagement schaffen wir Räume für Begegnung und persönliche Weiterentwicklung.
                     </p>
-                    <div class="d-flex gap-3">
+                    <div class="d-flex gap-3 mb-4">
                         <a href="{% url 'about' %}" class="btn btn-light btn-hero">Über uns</a>
+                    </div>
+                    
+                    <!-- Watermark Symbol - LZ Logo Style -->
+                    <div class="hero-watermark-symbol">
+                        <div class="watermark-lz-letters">
+                            <div class="letter-l">L</div>
+                            <div class="letter-z">Z</div>
+                        </div>
+                        <div class="watermark-wheel">
+                            <div class="wheel-outer"></div>
+                            <div class="wheel-spoke spoke-1"></div>
+                            <div class="wheel-spoke spoke-2"></div>
+                            <div class="wheel-spoke spoke-3"></div>
+                            <div class="wheel-hub"></div>
+                        </div>
+                        <div class="watermark-swoosh"></div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 text-center">
-                <!-- Centered Logo with Reflection -->
-                <div class="hero-logo-center">
-                    <div class="logo-reflection-container">
-                        <img src="{% static_with_version 'images/logo.png' %}" alt="Lesezirkel" class="img-fluid hero-center-logo">
-                        <div class="logo-reflection">
-                            <img src="{% static_with_version 'images/logo.png' %}" alt="Lesezirkel Reflection" class="img-fluid hero-center-logo-reflection">
+            
+            <!-- Center: Auto-sliding Gallery Carousel with Reflection -->
+            <div class="col-lg-4">
+                {% if recent_gallery %}
+                <div class="hero-gallery-section">
+                    <div id="heroGalleryCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="6000">
+                        <div class="carousel-inner">
+                            {% for item in recent_gallery|slice:":6" %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <div class="gallery-reflection-container">
+                                    <img src="{{ item.image.url }}" alt="{{ item.title }}" class="hero-gallery-img">
+                                    <div class="gallery-reflection-effect">
+                                        <img src="{{ item.image.url }}" alt="{{ item.title }} Reflection" class="hero-gallery-img-reflection">
+                                    </div>
+                                </div>
+                                <div class="carousel-caption-handwriting">
+                                    <p class="handwriting-text" data-text="{{ item.title }}">{{ item.title }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
+            
+            <!-- Right: Upcoming Events (Vertical) -->
             <div class="col-lg-4">
-                <!-- Upcoming Events Preview -->
                 <div class="hero-events-preview">
-                    <h3 class="text-light mb-4">
+                    <h3 class="text-light mb-3">
                         <i class="fas fa-calendar-alt me-2"></i>
                         Kommende Veranstaltungen
                     </h3>
                     {% if featured_events %}
-                        <div class="events-preview-list">
-                            {% for event in featured_events|slice:":3" %}
-                            <div class="event-preview-item bg-white bg-opacity-10 backdrop-blur rounded p-3 mb-3">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h5 class="text-light mb-1">{{ event.title }}</h5>
-                                    <span class="badge bg-light text-primary">
+                        <div class="events-preview-list-vertical">
+                            {% for event in featured_events|slice:":4" %}
+                            <div class="event-preview-item bg-white bg-opacity-10 backdrop-blur rounded p-3 mb-2">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <h6 class="text-light mb-0">{{ event.title }}</h6>
+                                    <span class="badge bg-light text-primary ms-2">
                                         {{ event.date|date:"d.m" }}
                                     </span>
                                 </div>
-                                <p class="text-light opacity-75 small mb-2">
+                                <p class="text-light opacity-75 small mb-1">
                                     <i class="fas fa-map-marker-alt me-1"></i>
                                     {{ event.location }}
-                                </p>
-                                <p class="text-light opacity-75 small mb-0">
-                                    {{ event.description|truncatewords:10 }}
                                 </p>
                             </div>
                             {% endfor %}
                         </div>
                         <div class="text-center mt-3">
                             <a href="{% url 'events' %}" class="btn btn-outline-light btn-sm">
-                                <i class="fas fa-arrow-right me-1"></i>
                                 Alle Veranstaltungen
                             </a>
                         </div>
                     {% else %}
                         <div class="bg-white bg-opacity-10 backdrop-blur rounded p-4 text-center">
-                            <i class="fas fa-calendar-plus fa-3x text-light opacity-50 mb-3"></i>
-                            <p class="text-light mb-0">
+                            <i class="fas fa-calendar-plus fa-2x text-light opacity-50 mb-2"></i>
+                            <p class="text-light mb-0 small">
                                 Neue Veranstaltungen werden bald bekannt gegeben.
                             </p>
                         </div>
@@ -204,15 +232,24 @@
 <section class="section">
     <div class="container">
         <h2 class="section-title">Fotogalerie</h2>
-        <div class="row">
+        
+        <div class="row g-3">
             {% for item in recent_gallery %}
-            <div class="col-lg-2 col-md-4 col-6 mb-3">
-                <img src="{{ item.image.url }}" alt="{{ item.title }}" class="gallery-img">
+            <div class="col-lg-4 col-md-6 mb-3 gallery-item">
+                <div class="gallery-card">
+                    <img src="{{ item.image.url }}" alt="{{ item.title }}" class="gallery-img" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h5 class="gallery-title">{{ item.title }}</h5>
+                    </div>
+                </div>
             </div>
             {% endfor %}
         </div>
+        
         <div class="text-center mt-4">
-            <a href="{% url 'gallery' %}" class="btn btn-outline-primary">Alle Fotos</a>
+            <a href="{% url 'gallery' %}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-images me-2"></i>Alle Fotos ansehen
+            </a>
         </div>
     </div>
 </section>

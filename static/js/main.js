@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }, observerOptions);
 
     // Observe elements for animation
-    document.querySelectorAll('.card, .feature-card, .team-card').forEach(el => {
+    document.querySelectorAll('.card, .feature-card, .team-card, .gallery-item').forEach(el => {
         observer.observe(el);
     });
 

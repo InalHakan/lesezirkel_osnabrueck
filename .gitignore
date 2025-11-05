@@ -63,6 +63,14 @@ db.sqlite3-journal
 lesezirkel_osnabrueck.sqlite3
 lesezirkel_osnabrueck.sqlite3-journal
 
+# Django media files (uploaded content - images, documents, etc.)
+media/**/*
+!media/.gitkeep
+
+# Django static files (collected static files)
+staticfiles/
+static_root/
+
 # Flask stuff:
 instance/
 .webassets-cache
