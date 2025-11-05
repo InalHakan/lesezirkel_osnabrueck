@@ -6,8 +6,11 @@ const connectDB = async () => {
     await mongoose.connect(mongoURI);
     console.log('MongoDB connected successfully');
   } catch (error) {
-    console.error('MongoDB connection error:', error);
-    process.exit(1);
+    console.error('MongoDB connection error:', error.message);
+    console.log('Warning: Running without database connection. Data will not persist.');
+    // Don't exit - allow the server to run for testing purposes
+    // In production, you might want to uncomment the line below
+    // process.exit(1);
   }
 };
 
