@@ -15,7 +15,7 @@ try:
 except ImportError:
     REPORTLAB_AVAILABLE = False
 
-from .models import Event, News, TeamMember, Gallery, Contact, EventRegistration, Document
+from .models import Event, News, TeamMember, Gallery, Contact, EventRegistration, Document, Certificate
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
@@ -653,6 +653,34 @@ class DocumentAdmin(admin.ModelAdmin):
     def formatted_file_size(self, obj):
         return obj.formatted_file_size
     formatted_file_size.short_description = 'Dateigröße'
+
+
+@admin.register(Certificate)
+class CertificateAdmin(admin.ModelAdmin):
+    list_display = ['participant_number', 'first_name', 'last_name', 'event_title', 'completion_date', 'created_at']
+    list_filter = ['completion_date', 'event_title', 'created_at']
+    search_fields = ['first_name', 'last_name', 'participant_number', 'event_title']
+    ordering = ['-completion_date', 'last_name', 'first_name']
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Teilnehmerinformationen', {
+            'fields': ('first_name', 'last_name', 'participant_number')
+        }),
+        ('Veranstaltungsinformationen', {
+            'fields': ('event_title', 'completion_date')
+        }),
+        ('Zertifikat', {
+            'fields': ('certificate_file',)
+        }),
+        ('Zeitstempel', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request)
 
 
 # Admin site title and header customization

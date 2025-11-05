@@ -10,9 +10,13 @@ urlpatterns = [
     path('nachrichten/', views.news, name='news'),
     path('nachricht/<int:pk>/', views.news_detail, name='news_detail'),
     path('galerie/', views.gallery, name='gallery'),
-    path('dokumente/', views.documents, name='documents'),
+    path('herunterladen/', views.herunterladen, name='herunterladen'),
     path('dokument/<int:pk>/download/', views.document_download, name='document_download'),
     path('dokument/<int:pk>/', views.document_view, name='document_detail'),
+    path('zertifikat-suche/', views.certificate_search, name='certificate_search'),
+    path('zertifikat/<int:pk>/download/', views.certificate_download, name='certificate_download'),
+    # Redirect old documents URL
+    re_path(r'^dokumente/?$', RedirectView.as_view(pattern_name='herunterladen', permanent=True)),
     # Öffentlich sichtbare URL soll deutsch ("/kontakt/") olsun, name='contact' korunuyor.
     path('kontakt/', views.contact, name='contact'),
     # Eski /contact/ isteklerini kalıcı yönlendirelim (SEO + mevcut linkler)

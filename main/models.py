@@ -156,13 +156,11 @@ class EventRegistration(models.Model):
 class Document(models.Model):
     """Document model for downloadable files"""
     CATEGORY_CHOICES = [
-        ('general', 'Allgemeine Dokumente'),
+        ('general', 'Alle Dokumente'),
         ('forms', 'Formulare'),
         ('brochures', 'Broschüren'),
         ('reports', 'Berichte'),
-        ('guidelines', 'Richtlinien'),
         ('certificates', 'Zertifikate'),
-        ('other', 'Sonstiges'),
     ]
     
     title = models.CharField(max_length=200, verbose_name="Titel")
@@ -219,3 +217,39 @@ class Document(models.Model):
 
     def get_download_url(self):
         return reverse('document_download', kwargs={'pk': self.pk})
+
+
+class Certificate(models.Model):
+    """Certificate model for downloadable participant certificates"""
+    first_name = models.CharField(max_length=100, verbose_name="Vorname")
+    last_name = models.CharField(max_length=100, verbose_name="Nachname")
+    participant_number = models.CharField(
+        max_length=20, 
+        unique=True, 
+        verbose_name="Teilnehmernummer",
+        help_text="Eindeutige Nummer für den Teilnehmer"
+    )
+    event_title = models.CharField(max_length=200, verbose_name="Veranstaltungstitel")
+    completion_date = models.DateField(verbose_name="Abschlussdatum")
+    certificate_file = models.FileField(
+        upload_to='certificates/',
+        verbose_name="Zertifikat",
+        help_text="PDF-Datei des Zertifikats"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Zertifikat"
+        verbose_name_plural = "Zertifikate"
+        ordering = ['-completion_date', 'last_name', 'first_name']
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} - {self.event_title} ({self.participant_number})"
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    def get_download_url(self):
+        return reverse('certificate_download', kwargs={'pk': self.pk})

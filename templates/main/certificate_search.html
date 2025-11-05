@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Zertifikat Suche - Lesezirkel Osnabrück{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Page Header -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 text-primary">Zertifikat Suche</h1>
+            <p class="lead">Geben Sie Ihre Daten ein, um Ihr persönliches Zertifikat herunterzuladen</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <!-- Search Form -->
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-certificate me-2"></i>
+                        Zertifikat-Daten eingeben
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" action="{% url 'certificate_search' %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="first_name" class="form-label">
+                                <i class="fas fa-user me-2"></i>Vorname *
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="first_name" 
+                                   name="first_name" 
+                                   required
+                                   placeholder="Ihr Vorname">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="last_name" class="form-label">
+                                <i class="fas fa-user me-2"></i>Nachname *
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="last_name" 
+                                   name="last_name" 
+                                   required
+                                   placeholder="Ihr Nachname">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="participant_number" class="form-label">
+                                <i class="fas fa-hashtag me-2"></i>Teilnehmernummer *
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="participant_number" 
+                                   name="participant_number" 
+                                   required
+                                   placeholder="z.B. TN-2024-001">
+                            <div class="form-text">
+                                Die Teilnehmernummer haben Sie bei der Anmeldung oder per E-Mail erhalten.
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-search me-2"></i>Zertifikat suchen
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Section -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="fas fa-question-circle text-primary me-2"></i>
+                        Hilfe bei der Suche
+                    </h6>
+                    <div class="small text-muted">
+                        <p class="mb-2">
+                            <strong>Teilnehmernummer vergessen?</strong><br>
+                            Die Teilnehmernummer wurde Ihnen bei der Anmeldung zur Veranstaltung mitgeteilt oder per E-Mail zugesendet.
+                        </p>
+                        <p class="mb-2">
+                            <strong>Probleme beim Finden?</strong><br>
+                            Kontaktieren Sie uns gerne unter: 
+                            <a href="mailto:info@lz-os.de" class="text-decoration-none">info@lz-os.de</a>
+                        </p>
+                        <p class="mb-0">
+                            <strong>Telefon:</strong> +49 (0) 15560 66 92 55<br>
+                            <strong>Bürozeiten:</strong> Dienstag & Donnerstag, 15:00 - 17:00 Uhr
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back to Downloads -->
+            <div class="text-center mt-4">
+                <a href="{% url 'herunterladen' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Zurück zu Downloads
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus first input
+    document.getElementById('first_name').focus();
+    
+    // Format participant number as user types
+    const participantNumberInput = document.getElementById('participant_number');
+    participantNumberInput.addEventListener('input', function(e) {
+        let value = e.target.value.toUpperCase();
+        // Remove any non-alphanumeric characters except hyphens
+        value = value.replace(/[^A-Z0-9-]/g, '');
+        e.target.value = value;
+    });
+});
+</script>
+{% endblock %}

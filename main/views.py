@@ -8,7 +8,7 @@ from django.db import transaction
 from datetime import datetime, date
 import calendar
 import os
-from .models import Event, News, TeamMember, Gallery, Contact, EventRegistration, Document
+from .models import Event, News, TeamMember, Gallery, Contact, EventRegistration, Document, Certificate
 from .forms import ContactForm
 from .document_utils import DocumentConverter
 
@@ -254,8 +254,8 @@ def privacy(request):
     return render(request, 'main/privacy.html')
 
 
-def documents(request):
-    """Documents page view"""
+def herunterladen(request):
+    """Download page view - renamed from documents"""
     category = request.GET.get('category', '')
     
     documents_list = Document.objects.filter(is_public=True)
@@ -279,7 +279,43 @@ def documents(request):
         'categories': categories,
         'selected_category': category,
     }
-    return render(request, 'main/documents.html', context)
+    return render(request, 'main/herunterladen.html', context)
+
+
+def certificate_search(request):
+    """Certificate search view"""
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        participant_number = request.POST.get('participant_number', '').strip()
+        
+        if not all([first_name, last_name, participant_number]):
+            messages.error(request, 'Bitte füllen Sie alle Felder aus.')
+            return render(request, 'main/certificate_search.html')
+        
+        try:
+            certificate = Certificate.objects.get(
+                first_name__iexact=first_name,
+                last_name__iexact=last_name,
+                participant_number=participant_number
+            )
+            return redirect('certificate_download', pk=certificate.pk)
+        except Certificate.DoesNotExist:
+            messages.error(request, 'Kein Zertifikat mit diesen Daten gefunden. Bitte überprüfen Sie Ihre Eingaben.')
+    
+    return render(request, 'main/certificate_search.html')
+
+
+def certificate_download(request, pk):
+    """Certificate download view"""
+    certificate = get_object_or_404(Certificate, pk=pk)
+    
+    try:
+        response = HttpResponse(certificate.certificate_file.read(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{certificate.full_name}_Zertifikat.pdf"'
+        return response
+    except FileNotFoundError:
+        raise Http404("Zertifikat nicht gefunden")
 
 
 def document_download(request, pk):
