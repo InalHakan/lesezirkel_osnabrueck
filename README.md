@@ -9,6 +9,7 @@ Eine Full-Stack-Webanwendung zur Verwaltung eines Lesezirkels in Osnabrück. Die
 - MongoDB mit Mongoose
 - RESTful API
 - CORS-Unterstützung
+- Rate Limiting (100 Anfragen pro 15 Minuten)
 
 ### Frontend
 - React
@@ -157,6 +158,33 @@ npm run dev  # Startet mit nodemon für automatischen Neustart
 cd frontend
 npm start  # Startet mit Hot Reload
 ```
+
+## Docker-Deployment
+
+Die Anwendung kann einfach mit Docker Compose bereitgestellt werden:
+
+```bash
+# Alle Services starten (MongoDB, Backend, Frontend)
+docker-compose up -d
+
+# Services stoppen
+docker-compose down
+
+# Services neu bauen
+docker-compose up -d --build
+```
+
+Nach dem Start ist die Anwendung unter folgenden URLs erreichbar:
+- Frontend: `http://localhost:3000`
+- Backend API: `http://localhost:5000/api`
+- MongoDB: `localhost:27017`
+
+## Sicherheit
+
+Die Anwendung implementiert folgende Sicherheitsmaßnahmen:
+- **Rate Limiting**: API-Anfragen sind auf 100 Anfragen pro 15 Minuten pro IP-Adresse beschränkt
+- **CORS**: Cross-Origin Resource Sharing ist aktiviert für Frontend-Integration
+- **Fehlerbehandlung**: Alle Fehler werden ordnungsgemäß behandelt und geloggt
 
 ## Lizenz
 
