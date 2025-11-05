@@ -16,6 +16,7 @@ except ImportError:
     REPORTLAB_AVAILABLE = False
 
 from .models import Event, News, TeamMember, Gallery, Contact, EventRegistration, Document, Certificate
+from .forms import EventRegistrationAdminForm
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
@@ -101,24 +102,30 @@ class ContactAdmin(admin.ModelAdmin):
 
 @admin.register(EventRegistration)
 class EventRegistrationAdmin(admin.ModelAdmin):
+    form = EventRegistrationAdminForm  # Use custom form with validation
     list_display = ['full_name', 'email', 'event', 'is_confirmed', 'privacy_consent', 'newsletter_consent', 'photo_consent', 'created_at']
     list_filter = ['is_confirmed', 'privacy_consent', 'newsletter_consent', 'photo_consent', 'event', 'created_at']
     search_fields = ['first_name', 'last_name', 'email', 'event__title']
     list_editable = ['is_confirmed']
-    readonly_fields = ['first_name', 'last_name', 'email', 'phone', 'message', 'privacy_consent', 'newsletter_consent', 'photo_consent', 'created_at']
+    readonly_fields = ['created_at']
     date_hierarchy = 'created_at'
     ordering = ['-created_at']
     actions = ['export_participant_list', 'export_participant_list_pdf']
     
     fieldsets = (
-        ('Teilnehmer', {
-            'fields': ('first_name', 'last_name', 'email', 'phone')
+        ('Veranstaltung', {
+            'fields': ('event',),
+            'description': 'Wählen Sie die Veranstaltung für die Anmeldung'
         }),
-        ('Anmeldung', {
-            'fields': ('event', 'message', 'is_confirmed')
+        ('Teilnehmerdaten', {
+            'fields': ('first_name', 'last_name', 'email', 'phone', 'message')
         }),
-        ('Einverständnisse', {
-            'fields': ('privacy_consent', 'newsletter_consent', 'photo_consent', 'created_at'),
+        ('Status & Einverständnisse', {
+            'fields': ('is_confirmed', 'privacy_consent', 'newsletter_consent', 'photo_consent'),
+            'description': 'Datenschutz-Einverständnis ist erforderlich für öffentliche Veranstaltungen'
+        }),
+        ('Zeitstempel', {
+            'fields': ('created_at',),
             'classes': ('collapse',)
         }),
     )

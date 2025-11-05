@@ -130,7 +130,7 @@ class EventRegistration(models.Model):
     email = models.EmailField(verbose_name="E-Mail")
     phone = models.CharField(max_length=20, blank=True, verbose_name="Telefon")
     message = models.TextField(blank=True, verbose_name="Nachricht/Anmerkungen")
-    privacy_consent = models.BooleanField(verbose_name="Datenschutz zugestimmt", 
+    privacy_consent = models.BooleanField(default=False, verbose_name="Datenschutz zugestimmt", 
                                         help_text="Einverständnis zur Datenschutzerklärung")
     newsletter_consent = models.BooleanField(default=False, verbose_name="Newsletter-Anmeldung",
                                            help_text="Möchte Newsletter erhalten")
