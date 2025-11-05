@@ -121,6 +121,117 @@ body {
     box-shadow: var(--box-shadow-hover);
 }
 
+/* Hero Center Logo */
+.hero-logo-center {
+    position: relative;
+    z-index: 2;
+    animation: fadeInScale 0.8s ease 0.2s both;
+}
+
+.logo-reflection-container {
+    position: relative;
+    display: inline-block;
+}
+
+.hero-center-logo {
+    max-height: 350px;
+    width: auto;
+    max-width: 100%;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2));
+    transition: var(--transition);
+    display: block;
+}
+
+.hero-center-logo:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 15px 40px rgba(0, 0, 0, 0.3));
+}
+
+/* Logo Reflection Effect */
+.logo-reflection {
+    position: relative;
+    overflow: hidden;
+    height: 100px; /* Height of reflection */
+    margin-top: -5px; /* Slight overlap */
+}
+
+.hero-center-logo-reflection {
+    max-height: 350px;
+    width: auto;
+    max-width: 100%;
+    transform: scaleY(-1); /* Flip vertically */
+    opacity: 0.3;
+    filter: blur(1px);
+    transition: var(--transition);
+    
+    /* Gradient mask for fade effect */
+    -webkit-mask: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0) 100%);
+    mask: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0) 100%);
+}
+
+/* Hover effect for reflection */
+.logo-reflection-container:hover .hero-center-logo-reflection {
+    opacity: 0.4;
+    transform: scaleY(-1) scale(1.05);
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Hero Events Preview */
+.hero-events-preview {
+    position: relative;
+    z-index: 2;
+    animation: fadeInRight 0.8s ease 0.3s both;
+}
+
+.events-preview-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.event-preview-item {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    transition: var(--transition);
+}
+
+.event-preview-item:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    transform: translateX(5px);
+}
+
+.backdrop-blur {
+    backdrop-filter: blur(10px);
+}
+
+.bg-opacity-10 {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.bg-opacity-15 {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 /* Card Styles */
 .card {
     border: none;
@@ -418,6 +529,37 @@ footer {
     .feature-card {
         margin-bottom: 2rem;
     }
+    
+    /* Hero Logo Responsive */
+    .hero-center-logo {
+        max-height: 250px;
+    }
+    
+    .hero-center-logo-reflection {
+        max-height: 250px;
+    }
+    
+    .logo-reflection {
+        height: 70px; /* Smaller reflection on tablet */
+    }
+    
+    .hero-events-preview h3 {
+        font-size: 1.25rem;
+    }
+    
+    .events-preview-list {
+        max-height: 300px;
+    }
+    
+    /* Stack layout for tablet */
+    .hero-section .row {
+        text-align: center;
+    }
+    
+    .hero-section .col-lg-4:nth-child(2) {
+        order: -1; /* Logo first on mobile */
+        margin-bottom: 2rem;
+    }
 }
 
 @media (max-width: 576px) {
@@ -439,6 +581,45 @@ footer {
     
     .card-body {
         padding: 1rem;
+    }
+    
+    /* Mobile Hero Layout */
+    .hero-center-logo {
+        max-height: 200px;
+    }
+    
+    .hero-center-logo-reflection {
+        max-height: 200px;
+    }
+    
+    .logo-reflection {
+        height: 50px; /* Even smaller reflection on mobile */
+    }
+    
+    .hero-events-preview {
+        margin-top: 2rem;
+    }
+    
+    .hero-events-preview h3 {
+        font-size: 1.1rem;
+        text-align: center;
+    }
+    
+    .events-preview-list {
+        max-height: 250px;
+    }
+    
+    .event-preview-item {
+        padding: 1rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .hero-section .col-lg-4 {
+        margin-bottom: 2rem;
+    }
+    
+    .hero-section .col-lg-4:last-child {
+        margin-bottom: 0;
     }
 }
 
