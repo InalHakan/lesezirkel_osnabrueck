@@ -18,9 +18,23 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+from django.views.decorators.cache import never_cache
+
+# Admin logout view that properly clears session
+@never_cache
+def admin_logout_view(request):
+    """Custom logout view for admin that properly clears session"""
+    logout(request)
+    # Clear any remaining session data
+    request.session.flush()
+    # Redirect to admin login page
+    return redirect('/admin/login/')
 
 # Ana URL yapısı (çok dilli sistem kaldırıldı)
 urlpatterns = [
+    path('admin/logout/', admin_logout_view, name='admin_logout'),
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('', include('main.urls')),
