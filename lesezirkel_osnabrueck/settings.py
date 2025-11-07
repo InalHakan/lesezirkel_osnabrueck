@@ -194,6 +194,16 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/events/'
 LOGOUT_REDIRECT_URL = '/'
 
+# Django Messages Framework - Bootstrap 5 compatibility
+from django.contrib.messages import constants as message_constants
+MESSAGE_TAGS = {
+    message_constants.DEBUG: 'secondary',
+    message_constants.INFO: 'info',
+    message_constants.SUCCESS: 'success',
+    message_constants.WARNING: 'warning',
+    message_constants.ERROR: 'danger',  # Bootstrap uses 'danger' for error (red)
+}
+
 # Jazzmin Admin Theme Configuration
 JAZZMIN_SETTINGS = {
     # Title on the login screen and header

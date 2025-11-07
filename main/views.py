@@ -8,9 +8,35 @@ from django.db import transaction
 from datetime import datetime, date
 import calendar
 import os
-from .models import Event, News, TeamMember, Gallery, Contact, EventRegistration, Document, Certificate
+import re
+from difflib import SequenceMatcher
+from .models import Event, News, TeamMember, Gallery, Contact, EventRegistration, Document, Certificate, InvitationCode
 from .forms import ContactForm
 from .document_utils import DocumentConverter
+
+
+def fuzzy_name_match(name1, name2, threshold=0.85):
+    """
+    Compare two names with fuzzy matching.
+    Returns True if similarity is >= threshold (default 85%)
+    Case-insensitive and handles special characters.
+    """
+    # Normalize: lowercase, remove extra spaces, remove special chars
+    def normalize(text):
+        text = text.lower().strip()
+        # Remove special characters but keep letters and spaces
+        text = re.sub(r'[^\w\s]', '', text)
+        # Remove extra spaces
+        text = ' '.join(text.split())
+        return text
+    
+    normalized1 = normalize(name1)
+    normalized2 = normalize(name2)
+    
+    # Calculate similarity ratio
+    similarity = SequenceMatcher(None, normalized1, normalized2).ratio()
+    
+    return similarity >= threshold
 
 def home(request):
     """Home page view"""
@@ -122,8 +148,109 @@ def event_detail(request, pk):
         privacy_consent = request.POST.get('privacy_consent') == 'on'
         newsletter_consent = request.POST.get('newsletter_consent') == 'on'
         photo_consent = request.POST.get('photo_consent') == 'on'
+        invitation_code_input = request.POST.get('invitation_code', '').strip()
         
-        if first_name and last_name and email and privacy_consent:
+        # Validate required fields
+        if not (first_name and last_name and email and privacy_consent):
+            messages.error(request, 'Bitte füllen Sie alle erforderlichen Felder aus und stimmen Sie der Datenschutzerklärung zu.')
+        # Validate invitation code if event requires it
+        elif event.invitation_only:
+            if not invitation_code_input:
+                messages.error(request, 'Für diese Veranstaltung ist ein Einladungscode erforderlich.')
+            else:
+                # Find invitation code (case-insensitive)
+                invitation_code_obj = InvitationCode.objects.filter(
+                    event=event,
+                    code__iexact=invitation_code_input
+                ).first()
+                
+                if not invitation_code_obj:
+                    messages.error(request, f'Der Einladungscode "{invitation_code_input}" ist ungültig.')
+                elif not invitation_code_obj.is_valid():
+                    # Check specific reason
+                    if not invitation_code_obj.is_active:
+                        messages.error(request, 'Dieser Einladungscode wurde deaktiviert.')
+                    elif invitation_code_obj.max_uses and invitation_code_obj.times_used >= invitation_code_obj.max_uses:
+                        messages.error(request, 'Dieser Einladungscode wurde bereits vollständig verwendet.')
+                    elif invitation_code_obj.expires_at and invitation_code_obj.expires_at < timezone.now():
+                        messages.error(request, 'Dieser Einladungscode ist abgelaufen.')
+                    else:
+                        messages.error(request, 'Dieser Einladungscode ist nicht mehr gültig.')
+                else:
+                    # Validate name matches invited_name (if specified)
+                    full_name = f"{first_name} {last_name}"
+                    if invitation_code_obj.invited_name:
+                        # Fuzzy match: 85% similarity, case-insensitive
+                        if not fuzzy_name_match(full_name, invitation_code_obj.invited_name, threshold=0.85):
+                            messages.error(request, 
+                                f'Der Name "{full_name}" stimmt nicht mit dem eingeladenen Namen überein. '
+                                f'Dieser Code ist für "{invitation_code_obj.invited_name}" bestimmt.')
+                        else:
+                            # Name matches, proceed with registration
+                            try:
+                                with transaction.atomic():
+                                    # Check if already registered
+                                    existing = EventRegistration.objects.filter(event=event, email=email).first()
+                                    if existing:
+                                        messages.warning(request, 'Sie sind bereits für diese Veranstaltung angemeldet.')
+                                    else:
+                                        # Create registration
+                                        EventRegistration.objects.create(
+                                            event=event,
+                                            first_name=first_name,
+                                            last_name=last_name,
+                                            email=email,
+                                            phone=phone,
+                                            message=message,
+                                            privacy_consent=privacy_consent,
+                                            newsletter_consent=newsletter_consent,
+                                            photo_consent=photo_consent,
+                                            invitation_code=invitation_code_obj
+                                        )
+                                        # Increment usage counter
+                                        invitation_code_obj.use_code()
+                                        messages.success(request, 
+                                            f'Willkommen {first_name}! Ihre Anmeldung wurde erfolgreich eingereicht. '
+                                            f'Sie erhalten eine Bestätigung per E-Mail.')
+                            except Exception as e:
+                                import logging
+                                logger = logging.getLogger(__name__)
+                                logger.error('Event registration error for event %s: %s', event.pk, str(e))
+                                messages.error(request, 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
+                    else:
+                        # No specific name required, just use the code
+                        try:
+                            with transaction.atomic():
+                                # Check if already registered
+                                existing = EventRegistration.objects.filter(event=event, email=email).first()
+                                if existing:
+                                    messages.warning(request, 'Sie sind bereits für diese Veranstaltung angemeldet.')
+                                else:
+                                    # Create registration
+                                    EventRegistration.objects.create(
+                                        event=event,
+                                        first_name=first_name,
+                                        last_name=last_name,
+                                        email=email,
+                                        phone=phone,
+                                        message=message,
+                                        privacy_consent=privacy_consent,
+                                        newsletter_consent=newsletter_consent,
+                                        photo_consent=photo_consent,
+                                        invitation_code=invitation_code_obj
+                                    )
+                                    # Increment usage counter
+                                    invitation_code_obj.use_code()
+                                    messages.success(request, 
+                                        f'Willkommen {first_name}! Ihre Anmeldung wurde erfolgreich eingereicht. '
+                                        f'Sie erhalten eine Bestätigung per E-Mail.')
+                        except Exception as e:
+                            import logging
+                            logger = logging.getLogger(__name__)
+                            logger.error('Event registration error for event %s: %s', event.pk, str(e))
+                            messages.error(request, 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
+        else:
+            # Normal registration (no invitation code required)
             try:
                 with transaction.atomic():
                     # Check if already registered
@@ -169,8 +296,6 @@ def event_detail(request, pk):
                 logger = logging.getLogger(__name__)
                 logger.error('Event registration error for event %s: %s', event.pk, str(e))
                 messages.error(request, 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
-        else:
-            messages.error(request, 'Bitte füllen Sie alle erforderlichen Felder aus und stimmen Sie der Datenschutzerklärung zu.')
     
     # Get current registrations count for capacity display
     current_registrations = 0

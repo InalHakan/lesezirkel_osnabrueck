@@ -66,13 +66,25 @@
             
             <div class="col-lg-4">
                 <!-- Event Registration Form -->
-                {% if event.registration_required and event.is_public and not is_past_event %}
+                {% if event.registration_required and not is_past_event %}
+                {% if event.is_public or event.invitation_only %}
                 <div class="card shadow border-0 mb-4">
                     <div class="card-body">
+                        {% if event.invitation_only %}
+                        <h5 class="card-title">
+                            <i class="fas fa-ticket-alt text-primary me-2"></i>
+                            Anmeldung mit Einladungscode
+                        </h5>
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Diese Veranstaltung ist nur mit gültiger Einladung zugänglich.
+                        </div>
+                        {% else %}
                         <h5 class="card-title">
                             <i class="fas fa-user-plus text-primary me-2"></i>
                             Anmeldung zur Veranstaltung
                         </h5>
+                        {% endif %}
                         
                         {% if event.max_participants and current_registrations >= event.max_participants %}
                             <div class="alert alert-warning">
@@ -104,6 +116,23 @@
                                 <label for="message" class="form-label">Anmerkungen</label>
                                 <textarea class="form-control" id="message" name="message" rows="3"></textarea>
                             </div>
+                            
+                            {% if event.invitation_only %}
+                            <!-- Invitation Code (Required for invitation-only events) -->
+                            <div class="mb-3">
+                                <label for="invitation_code" class="form-label">
+                                    <i class="fas fa-ticket-alt text-primary me-2"></i>
+                                    Einladungscode *
+                                </label>
+                                <input type="text" class="form-control text-uppercase" id="invitation_code" name="invitation_code" 
+                                       placeholder="z.B. IFTAR2025" required
+                                       style="font-family: monospace; letter-spacing: 2px;">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Bitte geben Sie den Einladungscode ein, den Sie erhalten haben.
+                                </small>
+                            </div>
+                            {% endif %}
                             
                             <!-- Privacy Consent -->
                             <div class="mb-3">
@@ -146,7 +175,8 @@
                         {% endif %}
                     </div>
                 </div>
-                {% elif event.registration_required and event.is_public and is_past_event %}
+                {% endif %}
+                {% elif event.registration_required and is_past_event %}
                 <!-- Past Event Message -->
                 <div class="card shadow border-0 mb-4">
                     <div class="card-body">
@@ -193,4 +223,25 @@
         </div>
     </div>
 </section>
+
+{% if event.invitation_only %}
+<script>
+// Auto-uppercase invitation code input
+document.addEventListener('DOMContentLoaded', function() {
+    const codeInput = document.getElementById('invitation_code');
+    if (codeInput) {
+        codeInput.addEventListener('input', function(e) {
+            const cursorPosition = this.selectionStart;
+            const originalValue = this.value;
+            const newValue = originalValue.toUpperCase();
+            
+            if (originalValue !== newValue) {
+                this.value = newValue;
+                this.setSelectionRange(cursorPosition, cursorPosition);
+            }
+        });
+    }
+});
+</script>
+{% endif %}
 {% endblock %}
