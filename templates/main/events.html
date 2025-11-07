@@ -73,11 +73,57 @@
     background: white;
     transition: var(--transition);
     z-index: 2;
+    overflow: visible;
 }
 
 .calendar-day:hover {
     background: #f8f9fa;
-    z-index: 1000; /* Elevated z-index on hover */
+    z-index: 3;
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Event titles directly in calendar cells */
+.event-title-link {
+    display: block;
+    padding: 2px 4px;
+    margin: 2px 0;
+    background: rgba(255, 255, 255, 0.9);
+    border-left: 3px solid var(--primary-color);
+    border-radius: 2px;
+    font-size: 0.75rem;
+    color: var(--dark-color);
+    text-decoration: none;
+    transition: var(--transition);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.event-title-link:hover {
+    background: var(--primary-color);
+    color: white !important;
+    transform: translateX(2px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.event-title-link.primary { border-left-color: var(--kulturelle-color); }
+.event-title-link.secondary { border-left-color: var(--secondary-color); }
+.event-title-link.success { border-left-color: var(--success-color); }
+.event-title-link.accent { border-left-color: var(--accent-color); }
+.event-title-link.purple { border-left-color: var(--purple-color); }
+.event-title-link.orange { border-left-color: var(--orange-color); }
+
+.event-title-link.primary:hover { background: var(--kulturelle-color); }
+.event-title-link.secondary:hover { background: var(--secondary-color); }
+.event-title-link.success:hover { background: var(--success-color); }
+.event-title-link.accent:hover { background: var(--accent-color); }
+.event-title-link.purple:hover { background: var(--purple-color); }
+.event-title-link.orange:hover { background: var(--orange-color); }
+
+.event-time {
+    font-size: 0.65rem;
+    opacity: 0.8;
 }
 
 .calendar-day.other-month {
@@ -105,6 +151,17 @@
     font-weight: 700 !important;
 }
 
+.calendar-day.today .event-title-link {
+    background: rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+    border-left-color: white !important;
+}
+
+.calendar-day.today .event-title-link:hover {
+    background: rgba(255, 255, 255, 0.5) !important;
+    transform: scale(1.05);
+}
+
 .calendar-day.today:hover {
     transform: scale(1.08) !important;
     box-shadow: 0 6px 20px rgba(30, 58, 138, 0.5) !important;
@@ -112,7 +169,7 @@
 
 /* Category highlighting for days with events */
 .calendar-day.has-event { position: relative; }
-.calendar-day.has-event.primary { background: color-mix(in srgb, var(--primary-color) 18%, #ffffff); }
+.calendar-day.has-event.primary { background: color-mix(in srgb, var(--kulturelle-color) 18%, #ffffff); }
 .calendar-day.has-event.secondary { background: color-mix(in srgb, var(--secondary-color) 18%, #ffffff); }
 .calendar-day.has-event.success { background: color-mix(in srgb, var(--success-color) 18%, #ffffff); }
 .calendar-day.has-event.accent { background: color-mix(in srgb, var(--accent-color) 18%, #ffffff); }
@@ -132,7 +189,7 @@
 
 /* Fallback for browsers without color-mix */
 @supports not (background: color-mix(in srgb, white, black)) {
-    .calendar-day.has-event.primary { background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-color) 10%, #fff 10%); }
+    .calendar-day.has-event.primary { background: linear-gradient(180deg, var(--kulturelle-color) 0%, var(--kulturelle-color) 10%, #fff 10%); }
     .calendar-day.has-event.secondary { background: linear-gradient(180deg, var(--secondary-color) 0%, var(--secondary-color) 10%, #fff 10%); }
     .calendar-day.has-event.success { background: linear-gradient(180deg, var(--success-color) 0%, var(--success-color) 10%, #fff 10%); }
     .calendar-day.has-event.accent { background: linear-gradient(180deg, var(--accent-color) 0%, var(--accent-color) 10%, #fff 10%); }
@@ -143,7 +200,7 @@
 /* Multi-event color bar */
 .event-bar { position:absolute; top:0; left:0; right:0; height:6px; display:flex; overflow:hidden; border-radius:2px 2px 0 0; }
 .event-bar-segment { flex:1; }
-.event-bar-segment.primary { background: var(--primary-color); }
+.event-bar-segment.primary { background: var(--kulturelle-color); }
 .event-bar-segment.secondary { background: var(--secondary-color); }
 .event-bar-segment.success { background: var(--success-color); }
 .event-bar-segment.accent { background: var(--accent-color); }
@@ -418,37 +475,15 @@
                             {% if day != 0 %}
                                 <div class="day-number">{{ day }}</div>
                                 {% if day_events %}
-                                    <!-- Multi category bar (shows all event categories that day) -->
-                                    <div class="event-bar">
-                                        {% for ev in day_events %}
-                                            <span class="event-bar-segment {{ ev.category }}" 
-                                                  title="{{ ev.title|default:'Veranstaltung' }} - {{ ev.date|date:'H:i' }} - {{ ev.location|default:'Ort TBA' }}"
-                                                  data-bs-toggle="tooltip" 
-                                                  data-bs-placement="top"></span>
-                                        {% endfor %}
-                                    </div>
-                                    <!-- Dots retained for accessibility / hover targets -->
-                                    <div class="events-dots" style="margin-top:4px;">
+                                    <!-- Event titles directly clickable -->
+                                    <div class="events-list-inline">
                                         {% for event in day_events %}
-                                            <span class="event-dot {{ event.category }}" 
-                                                  title="{{ event.title|default:'Veranstaltung' }} - {{ event.date|date:'H:i' }} - {{ event.location|default:'Ort TBA' }}"
-                                                  data-bs-toggle="tooltip" 
-                                                  data-bs-placement="top"></span>
-                                        {% endfor %}
-                                    </div>
-                                    <!-- Event Preview -->
-                                    <div class="event-preview">
-                                        {% for event in day_events %}
-                                            <div class="event-item-preview">
-                                                <h6>{{ event.title|default:'Veranstaltung' }}</h6>
-                                                <p><i class="fas fa-clock me-1"></i>{{ event.date|date:"H:i" }}</p>
-                                                <p><i class="fas fa-map-marker-alt me-1"></i>{{ event.location|default:'Ort wird noch bekannt gegeben' }}</p>
-                                                {% if event.description %}
-                                                    <p class="small">{{ event.description|truncatewords:10 }}</p>
-                                                {% endif %}
-                                                <a href="{% url 'event_detail' event.pk %}" class="btn btn-primary btn-sm">Details</a>
-                                                {% if not forloop.last %}<hr class="my-2">{% endif %}
-                                            </div>
+                                            <a href="{% url 'event_detail' event.pk %}" 
+                                               class="event-title-link {{ event.category }}"
+                                               title="{{ event.title }} - {{ event.date|date:'H:i' }} Uhr, {{ event.location }}">
+                                                <span class="event-time">{{ event.date|date:"H:i" }}</span>
+                                                {{ event.title|truncatewords:4 }}
+                                            </a>
                                         {% endfor %}
                                     </div>
                                 {% endif %}
@@ -464,7 +499,7 @@
         <div class="legend">
             <h5 class="mb-3"><i class="fas fa-info-circle me-2"></i>Legende</h5>
             <div class="legend-item">
-                <span class="legend-dot" style="background: var(--primary-color);"></span>
+                <span class="legend-dot" style="background: var(--kulturelle-color);"></span>
                 Kulturelle Veranstaltungen
             </div>
             <div class="legend-item">

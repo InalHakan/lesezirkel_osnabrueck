@@ -83,7 +83,7 @@
                     </h3>
                     {% if featured_events %}
                         <div class="events-preview-list-vertical">
-                            {% for event in featured_events|slice:":4" %}
+                            {% for event in featured_events %}
                             <div class="event-preview-item bg-white bg-opacity-10 backdrop-blur rounded p-3 mb-2">
                                 <div class="d-flex justify-content-between align-items-start mb-1">
                                     <h6 class="text-light mb-0">{{ event.title }}</h6>

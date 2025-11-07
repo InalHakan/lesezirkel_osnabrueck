@@ -3,10 +3,11 @@
 :root {
     --primary-color: #1e3a8a;     /* Deep blue - matches logo */
     --secondary-color: #3b82f6;   /* Bright blue - secondary logo color */
-    --accent-color: #1e40af;      /* Navy blue - darker accent */
+    --accent-color: #1e40af;      /* Navy blue - for Sprachkurse */
     --success-color: #10b981;     /* Green - success messages */
     --purple-color: #9333ea;      /* Purple - for Begegnungen */
     --orange-color: #f97316;      /* Orange - for Feste & Feiern */
+    --kulturelle-color: #dc2626;  /* Red - for Kulturelle Veranstaltungen */
     --light-blue: #60a5fa;       /* Light blue - lighter tones */
     --dark-blue: #1e293b;        /* Very dark blue - text */
     --dark-color: #1e293b;        /* Dark blue-gray for text */

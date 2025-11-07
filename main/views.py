@@ -14,13 +14,14 @@ from .document_utils import DocumentConverter
 
 def home(request):
     """Home page view"""
-    # Featured events and news
-    featured_events = Event.objects.filter(is_featured=True)[:3]
+    # Get upcoming events (not just featured ones) - all future events
+    from datetime import datetime
+    upcoming_events = Event.objects.filter(date__gte=timezone.now()).order_by('date')[:8]  # Next 8 events
     featured_news = News.objects.filter(is_featured=True)[:3]
     recent_gallery = Gallery.objects.all()[:6]
     
     context = {
-        'featured_events': featured_events,
+        'featured_events': upcoming_events,  # Keep same variable name for template compatibility
         'featured_news': featured_news,
         'recent_gallery': recent_gallery,
     }
@@ -108,8 +109,11 @@ def event_detail(request, pk):
     event = get_object_or_404(Event, pk=pk)
     related_events = Event.objects.exclude(pk=pk)[:3]
     
-    # Handle event registration
-    if request.method == 'POST' and event.registration_required and event.is_public:
+    # Check if event is in the past
+    is_past_event = event.date < timezone.now()
+    
+    # Handle event registration (only for future events)
+    if request.method == 'POST' and event.registration_required and event.is_public and not is_past_event:
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
@@ -177,6 +181,7 @@ def event_detail(request, pk):
         'event': event,
         'related_events': related_events,
         'current_registrations': current_registrations,
+        'is_past_event': is_past_event,  # Pass to template
     }
     return render(request, 'main/event_detail.html', context)
 

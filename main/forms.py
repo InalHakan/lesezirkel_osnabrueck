@@ -1,5 +1,144 @@
 from django import forms
-from .models import Contact, EventRegistration
+from django.contrib.admin.widgets import AdminDateWidget, AdminTimeWidget, AdminSplitDateTime
+from .models import Contact, EventRegistration, Event, News
+from datetime import datetime
+
+
+class GermanDateInput(forms.DateInput):
+    """Custom Date input widget that accepts German date format (DD.MM.YYYY or DD/MM/YYYY)"""
+    
+    def __init__(self, attrs=None, format=None):
+        default_attrs = {
+            'placeholder': 'TT.MM.JJJJ',
+            'class': 'vDateField',
+            'type': 'text',  # Use text instead of date for manual entry
+        }
+        if attrs:
+            default_attrs.update(attrs)
+        super().__init__(attrs=default_attrs, format='%d.%m.%Y')
+    
+    def format_value(self, value):
+        """Format the value for display in German format"""
+        if value:
+            if isinstance(value, str):
+                try:
+                    # Try parsing ISO format first
+                    value = datetime.strptime(value, '%Y-%m-%d').date()
+                except ValueError:
+                    try:
+                        # Try German format
+                        value = datetime.strptime(value, '%d.%m.%Y').date()
+                    except ValueError:
+                        return value
+            if hasattr(value, 'strftime'):
+                return value.strftime('%d.%m.%Y')
+        return value
+
+
+class GermanTimeInput(forms.TimeInput):
+    """Custom Time input widget that accepts German time format (HH:MM)"""
+    
+    def __init__(self, attrs=None, format=None):
+        default_attrs = {
+            'placeholder': 'HH:MM',
+            'class': 'vTimeField',
+            'type': 'text',
+        }
+        if attrs:
+            default_attrs.update(attrs)
+        super().__init__(attrs=default_attrs, format='%H:%M')
+    
+    def format_value(self, value):
+        """Format the value for display as HH:MM (no seconds)"""
+        if value:
+            if isinstance(value, str):
+                try:
+                    # Parse and reformat to remove seconds
+                    value = datetime.strptime(value, '%H:%M:%S').time()
+                except ValueError:
+                    try:
+                        value = datetime.strptime(value, '%H:%M').time()
+                    except ValueError:
+                        return value
+            if hasattr(value, 'strftime'):
+                return value.strftime('%H:%M')
+        return value
+
+
+class GermanSplitDateTimeWidget(forms.MultiWidget):
+    """Split DateTime widget with German date format and time without seconds"""
+    
+    def __init__(self, attrs=None):
+        widgets = [
+            GermanDateInput(),
+            GermanTimeInput(),
+        ]
+        super().__init__(widgets, attrs)
+    
+    def decompress(self, value):
+        if value:
+            if isinstance(value, str):
+                try:
+                    value = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+                except ValueError:
+                    try:
+                        value = datetime.strptime(value, '%Y-%m-%d %H:%M')
+                    except ValueError:
+                        return [None, None]
+            return [value.date(), value.time()]
+        return [None, None]
+
+
+class GermanSplitDateTimeField(forms.MultiValueField):
+    """Field for split date and time with German format support"""
+    widget = GermanSplitDateTimeWidget
+    
+    def __init__(self, *args, **kwargs):
+        fields = [
+            forms.DateField(input_formats=['%d.%m.%Y', '%d/%m/%Y', '%Y-%m-%d']),
+            forms.TimeField(input_formats=['%H:%M', '%H:%M:%S']),
+        ]
+        super().__init__(fields, *args, **kwargs)
+    
+    def compress(self, data_list):
+        if data_list:
+            date_value = data_list[0]
+            time_value = data_list[1]
+            if date_value and time_value:
+                return datetime.combine(date_value, time_value)
+        return None
+
+
+class EventAdminForm(forms.ModelForm):
+    """Custom admin form for Event with German date format support and default location"""
+    
+    date = GermanSplitDateTimeField(
+        label='Datum',
+        help_text='Format: TT.MM.JJJJ HH:MM (z.B. 25.12.2024 15:30)'
+    )
+    
+    class Meta:
+        model = Event
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set default location to "Vor Ort" for new events
+        if not self.instance.pk:  # Only for new instances
+            self.fields['location'].initial = 'Vor Ort'
+
+
+class NewsAdminForm(forms.ModelForm):
+    """Custom admin form for News with German date format support"""
+    
+    published_date = GermanSplitDateTimeField(
+        label='Veröffentlichungsdatum',
+        help_text='Format: TT.MM.JJJJ HH:MM (z.B. 25.12.2024 15:30)'
+    )
+    
+    class Meta:
+        model = News
+        fields = '__all__'
 
 
 class ContactForm(forms.ModelForm):

@@ -25,6 +25,8 @@ class Event(models.Model):
                                    help_text="Wenn aktiviert, ist die Veranstaltung für alle offen und benötigt Datenschutzerklärung")
     registration_required = models.BooleanField(default=False, verbose_name="Anmeldung erforderlich",
                                               help_text="Wenn aktiviert, wird ein Anmeldeformular angezeigt")
+    invitation_only = models.BooleanField(default=False, verbose_name="Nur mit Einladung",
+                                         help_text="Wenn aktiviert, ist ein Einladungscode für die Anmeldung erforderlich")
     max_participants = models.PositiveIntegerField(blank=True, null=True, verbose_name="Maximale Teilnehmerzahl",
                                                  help_text="Leer lassen für unbegrenzte Teilnehmer")
     category = models.CharField(
@@ -136,6 +138,9 @@ class EventRegistration(models.Model):
                                            help_text="Möchte Newsletter erhalten")
     photo_consent = models.BooleanField(default=False, verbose_name="Fotoerlaubnis",
                                       help_text="Einverständnis zur Anfertigung und Veröffentlichung von Fotos")
+    invitation_code = models.ForeignKey('InvitationCode', on_delete=models.SET_NULL, blank=True, null=True,
+                                       verbose_name="Einladungscode", related_name="registrations",
+                                       help_text="Falls mit Einladungscode angemeldet")
     created_at = models.DateTimeField(auto_now_add=True)
     is_confirmed = models.BooleanField(default=False, verbose_name="Bestätigt")
     
@@ -151,6 +156,92 @@ class EventRegistration(models.Model):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
+
+
+class InvitationCode(models.Model):
+    """Invitation code model for exclusive event invitations"""
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, verbose_name="Veranstaltung", related_name="invitation_codes")
+    code = models.CharField(max_length=50, unique=True, verbose_name="Einladungscode",
+                          help_text="Eindeutiger Code für diese Einladung (nur Großbuchstaben A-Z, Zahlen 0-9 und Bindestrich)")
+    invited_name = models.CharField(max_length=200, blank=True, verbose_name="Name des Eingeladenen",
+                                   help_text="Name der eingeladenen Person (optional, nur zur Erinnerung)")
+    max_uses = models.PositiveIntegerField(default=1, verbose_name="Maximale Nutzungen",
+                                          help_text="Wie oft dieser Code verwendet werden kann")
+    times_used = models.PositiveIntegerField(default=0, verbose_name="Bereits verwendet")
+    is_active = models.BooleanField(default=True, verbose_name="Aktiv")
+    expires_at = models.DateTimeField(blank=True, null=True, verbose_name="Gültig bis",
+                                     help_text="Leer lassen für unbegrenzte Gültigkeit")
+    notes = models.TextField(blank=True, verbose_name="Notizen",
+                            help_text="Interne Notizen zu dieser Einladung")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Einladungscode"
+        verbose_name_plural = "Einladungscodes"
+    
+    def __str__(self):
+        return f"{self.code} - {self.event.title}"
+    
+    def clean(self):
+        """Validate invitation code format"""
+        import re
+        from django.core.exceptions import ValidationError
+        
+        if self.code:
+            # Convert to uppercase
+            self.code = self.code.upper().strip()
+            
+            # Validate format: only A-Z, 0-9, and hyphen
+            if not re.match(r'^[A-Z0-9-]+$', self.code):
+                raise ValidationError({
+                    'code': 'Einladungscode darf nur Großbuchstaben (A-Z), Zahlen (0-9) und Bindestriche (-) enthalten.'
+                })
+            
+            # Minimum length check
+            if len(self.code) < 3:
+                raise ValidationError({
+                    'code': 'Einladungscode muss mindestens 3 Zeichen lang sein.'
+                })
+            
+            # Check uniqueness (excluding current instance if editing)
+            existing = InvitationCode.objects.filter(code=self.code)
+            if self.pk:
+                existing = existing.exclude(pk=self.pk)
+            
+            if existing.exists():
+                raise ValidationError({
+                    'code': f'Der Einladungscode "{self.code}" existiert bereits. Bitte wählen Sie einen anderen Code.'
+                })
+    
+    def save(self, *args, **kwargs):
+        # Always convert to uppercase before saving
+        if self.code:
+            self.code = self.code.upper().strip()
+        super().save(*args, **kwargs)
+    
+    def is_valid(self):
+        """Check if invitation code is still valid"""
+        if not self.is_active:
+            return False, "Dieser Einladungscode wurde deaktiviert."
+        
+        if self.times_used >= self.max_uses:
+            return False, "Dieser Einladungscode wurde bereits vollständig verwendet."
+        
+        if self.expires_at and timezone.now() > self.expires_at:
+            return False, "Dieser Einladungscode ist abgelaufen."
+        
+        # Check if event is in the past
+        if self.event.date < timezone.now():
+            return False, "Diese Veranstaltung hat bereits stattgefunden."
+        
+        return True, "Code ist gültig."
+    
+    def use_code(self):
+        """Increment usage counter"""
+        self.times_used += 1
+        self.save()
 
 
 class Document(models.Model):

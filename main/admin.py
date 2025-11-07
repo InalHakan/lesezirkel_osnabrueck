@@ -15,15 +15,16 @@ try:
 except ImportError:
     REPORTLAB_AVAILABLE = False
 
-from .models import Event, News, TeamMember, Gallery, Contact, EventRegistration, Document, Certificate
-from .forms import EventRegistrationAdminForm
+from .models import Event, News, TeamMember, Gallery, Contact, EventRegistration, Document, Certificate, InvitationCode
+from .forms import EventRegistrationAdminForm, EventAdminForm, NewsAdminForm
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ['title', 'date', 'location', 'category', 'is_featured', 'is_public', 'registration_required', 'created_at']
-    list_filter = ['category', 'is_featured', 'is_public', 'registration_required', 'date', 'created_at']
+    form = EventAdminForm  # Use custom form with German date format
+    list_display = ['title', 'date', 'location', 'category', 'is_featured', 'is_public', 'registration_required', 'invitation_only', 'created_at']
+    list_filter = ['category', 'is_featured', 'is_public', 'registration_required', 'invitation_only', 'date', 'created_at']
     search_fields = ['title', 'description', 'location']
-    list_editable = ['category', 'is_featured', 'is_public', 'registration_required']
+    list_editable = ['category', 'is_featured', 'is_public', 'registration_required', 'invitation_only']
     date_hierarchy = 'date'
     ordering = ['-date']
     actions = ['export_event_participant_list', 'export_event_participant_list_pdf']
@@ -34,8 +35,8 @@ class EventAdmin(admin.ModelAdmin):
             'description': 'Allgemeine Informationen über die Veranstaltung'
         }),
         ('Sichtbarkeit und Anmeldung', {
-            'fields': ('is_featured', 'is_public', 'registration_required', 'max_participants'),
-            'description': 'Öffentliche Veranstaltungen benötigen Datenschutzerklärung bei Anmeldungen.',
+            'fields': ('is_featured', 'is_public', 'registration_required', 'invitation_only', 'max_participants'),
+            'description': 'Öffentliche Veranstaltungen benötigen Datenschutzerklärung bei Anmeldungen. Mit "Nur mit Einladung" können Sie Einladungscodes erstellen.',
             'classes': ('wide',)
         }),
     )
@@ -66,6 +67,7 @@ class EventAdmin(admin.ModelAdmin):
 
 @admin.register(News)
 class NewsAdmin(admin.ModelAdmin):
+    form = NewsAdminForm  # Use custom form with German date format
     list_display = ['title', 'published_date', 'is_featured', 'created_at']
     list_filter = ['is_featured', 'published_date', 'created_at']
     search_fields = ['title', 'content']
@@ -100,12 +102,106 @@ class ContactAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
 
 
+@admin.register(InvitationCode)
+class InvitationCodeAdmin(admin.ModelAdmin):
+    list_display = ['code', 'event', 'invited_name', 'is_active', 'times_used', 'max_uses', 'expires_at', 'created_at']
+    list_filter = ['is_active', 'event', 'created_at']
+    search_fields = ['code', 'invited_name', 'event__title', 'notes']
+    list_editable = ['is_active']
+    readonly_fields = ['times_used', 'created_at', 'updated_at']
+    date_hierarchy = 'created_at'
+    ordering = ['-created_at']
+    
+    class Media:
+        js = ('admin/js/invitation_code_generator.js',)
+    
+    fieldsets = (
+        ('Einladungscode', {
+            'fields': ('event', 'code', 'invited_name'),
+            'description': 'Erstellen Sie einen eindeutigen Code für diese Einladung. Format: nur Großbuchstaben und Zahlen (z.B. IFTAR2024-ABC123)'
+        }),
+        ('Einstellungen', {
+            'fields': ('max_uses', 'times_used', 'is_active', 'expires_at'),
+            'description': 'Konfigurieren Sie die Nutzungsbedingungen'
+        }),
+        ('Notizen', {
+            'fields': ('notes',),
+            'classes': ('collapse',)
+        }),
+        ('Zeitstempel', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def get_readonly_fields(self, request, obj=None):
+        """Make code readonly after creation"""
+        if obj:  # Editing existing object
+            return self.readonly_fields + ('code', 'event')
+        return self.readonly_fields
+    
+    def render_change_form(self, request, context, *args, **kwargs):
+        """Add inline JavaScript for code generator"""
+        response = super().render_change_form(request, context, *args, **kwargs)
+        
+        # Only add button for new codes (not when editing)
+        if not kwargs.get('obj'):
+            context['adminform'].form.fields['code'].help_text = format_html(
+                '''<div id="code-generator-inline">
+                    <button type="button" id="generate-code-btn" class="button" style="margin-top: 10px; background-color: #417690; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer;">
+                        <i class="fas fa-random"></i> Zufälliger Code generieren
+                    </button>
+                    <script>
+                    (function() {{
+                        if (typeof django !== 'undefined' && django.jQuery) {{
+                            django.jQuery(document).ready(function($) {{
+                                function generateRandomCode() {{
+                                    // Karışık karakterleri hariç tut: 0, O, I, 1
+                                    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                                    let code = '';
+                                    for (let i = 0; i < 6; i++) {{
+                                        code += chars.charAt(Math.floor(Math.random() * chars.length));
+                                    }}
+                                    return code;
+                                }}
+                                
+                                $('#generate-code-btn').on('click', function(e) {{
+                                    e.preventDefault();
+                                    const randomCode = generateRandomCode();
+                                    $('#id_code').val(randomCode);
+                                    $('#id_code').css('background-color', '#d4edda');
+                                    setTimeout(function() {{
+                                        $('#id_code').css('background-color', '');
+                                    }}, 1000);
+                                }});
+                                
+                                $('#id_code').on('input', function() {{
+                                    const input = $(this);
+                                    const originalValue = input.val();
+                                    const newValue = originalValue.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+                                    
+                                    if (originalValue !== newValue) {{
+                                        const cursorPosition = this.selectionStart;
+                                        input.val(newValue);
+                                        this.setSelectionRange(cursorPosition, cursorPosition);
+                                    }}
+                                }});
+                            }});
+                        }}
+                    }})();
+                    </script>
+                </div>'''
+            )
+        
+        return response
+
+
 @admin.register(EventRegistration)
 class EventRegistrationAdmin(admin.ModelAdmin):
     form = EventRegistrationAdminForm  # Use custom form with validation
-    list_display = ['full_name', 'email', 'event', 'is_confirmed', 'privacy_consent', 'newsletter_consent', 'photo_consent', 'created_at']
+    list_display = ['full_name', 'email', 'event', 'invitation_code', 'is_confirmed', 'privacy_consent', 'newsletter_consent', 'photo_consent', 'created_at']
     list_filter = ['is_confirmed', 'privacy_consent', 'newsletter_consent', 'photo_consent', 'event', 'created_at']
-    search_fields = ['first_name', 'last_name', 'email', 'event__title']
+    search_fields = ['first_name', 'last_name', 'email', 'event__title', 'invitation_code__code']
     list_editable = ['is_confirmed']
     readonly_fields = ['created_at']
     date_hierarchy = 'created_at'
@@ -114,8 +210,8 @@ class EventRegistrationAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Veranstaltung', {
-            'fields': ('event',),
-            'description': 'Wählen Sie die Veranstaltung für die Anmeldung'
+            'fields': ('event', 'invitation_code'),
+            'description': 'Wählen Sie die Veranstaltung und optional den verwendeten Einladungscode'
         }),
         ('Teilnehmerdaten', {
             'fields': ('first_name', 'last_name', 'email', 'phone', 'message')

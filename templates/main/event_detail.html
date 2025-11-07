@@ -66,7 +66,7 @@
             
             <div class="col-lg-4">
                 <!-- Event Registration Form -->
-                {% if event.registration_required and event.is_public %}
+                {% if event.registration_required and event.is_public and not is_past_event %}
                 <div class="card shadow border-0 mb-4">
                     <div class="card-body">
                         <h5 class="card-title">
@@ -144,6 +144,20 @@
                             </button>
                         </form>
                         {% endif %}
+                    </div>
+                </div>
+                {% elif event.registration_required and event.is_public and is_past_event %}
+                <!-- Past Event Message -->
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-calendar-times text-muted me-2"></i>
+                            Vergangene Veranstaltung
+                        </h5>
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Diese Veranstaltung hat bereits stattgefunden. Eine Anmeldung ist nicht mehr möglich.
+                        </div>
                     </div>
                 </div>
                 {% endif %}
