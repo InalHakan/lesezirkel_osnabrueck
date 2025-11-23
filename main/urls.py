@@ -21,6 +21,7 @@ urlpatterns = [
     path('kontakt/', views.contact, name='contact'),
     # Eski /contact/ isteklerini kalıcı yönlendirelim (SEO + mevcut linkler)
     re_path(r'^contact/?$', RedirectView.as_view(pattern_name='contact', permanent=True)),
+    path('spenden/', views.donate, name='donate'),
     path('impressum/', views.impressum, name='impressum'),
     path('datenschutz/', views.privacy, name='privacy'),
 ]

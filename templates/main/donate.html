@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Spenden - Lesezirkel Osnabrück e.V.{% endblock %}
+
+{% block content %}
+<!-- Donate Section -->
+<section class="section" style="padding-top: 100px;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <h1 class="display-4 mb-3">
+                        <i class="fas fa-heart text-danger me-3"></i>
+                        Unterstützen Sie unsere Arbeit
+                    </h1>
+                    <p class="lead text-muted">
+                        Ihre Spende hilft uns, kulturelle Brücken zu bauen und Menschen zusammenzubringen.
+                    </p>
+                </div>
+
+                <!-- Why Donate -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="card-title mb-4">
+                            <i class="fas fa-hands-helping text-primary me-2"></i>
+                            Warum spenden?
+                        </h3>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex">
+                                    <i class="fas fa-book-reader text-primary me-3 mt-1" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <h5>Kulturelle Veranstaltungen</h5>
+                                        <p class="text-muted mb-0">Wir organisieren regelmäßig Lesungen, Diskussionen und kulturelle Events.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex">
+                                    <i class="fas fa-users text-primary me-3 mt-1" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <h5>Gemeinschaft fördern</h5>
+                                        <p class="text-muted mb-0">Wir bringen Menschen unterschiedlicher Kulturen zusammen.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex">
+                                    <i class="fas fa-graduation-cap text-primary me-3 mt-1" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <h5>Bildung & Integration</h5>
+                                        <p class="text-muted mb-0">Wir unterstützen Bildungsprojekte und Integrationsinitiativen.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex">
+                                    <i class="fas fa-globe text-primary me-3 mt-1" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <h5>Interkultureller Dialog</h5>
+                                        <p class="text-muted mb-0">Wir fördern den Austausch zwischen verschiedenen Kulturen.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Donation Methods -->
+                <div class="row">
+                    <!-- Bank Transfer -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body p-4">
+                                <h4 class="card-title mb-3">
+                                    <i class="fas fa-university text-primary me-2"></i>
+                                    Banküberweisung
+                                </h4>
+                                <p class="text-muted mb-4">Spenden Sie direkt per SEPA-Überweisung</p>
+                                
+                                <div class="bg-light p-3 rounded mb-3">
+                                    <div class="mb-2">
+                                        <small class="text-muted">Kontoinhaber:</small><br>
+                                        <strong>Lesezirkel Osnabrück e.V.</strong>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">IBAN:</small><br>
+                                        <strong class="font-monospace">DE52 2655 0105 0000 2855 02</strong>
+                                        <button class="btn btn-sm btn-outline-primary ms-2" onclick="copyIBAN()">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">BIC:</small><br>
+                                        <strong class="font-monospace">NOLADE22XXX</strong>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">Verwendungszweck:</small><br>
+                                        <strong>Spende Lesezirkel</strong>
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-info mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <small>Als gemeinnütziger Verein können wir Ihnen eine Spendenbescheinigung ausstellen.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PayPal -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body p-4">
+                                <h4 class="card-title mb-3">
+                                    <i class="fab fa-paypal text-primary me-2"></i>
+                                    PayPal
+                                </h4>
+                                <p class="text-muted mb-4">Schnell und sicher online spenden</p>
+                                
+                                <!-- PayPal Button Placeholder -->
+                                <div class="text-center p-4 bg-light rounded mb-3">
+                                    <p class="mb-3">Spenden Sie bequem mit PayPal:</p>
+                                    
+                                    <!-- Replace with actual PayPal button code -->
+                                    <a href="https://www.paypal.com/donate" target="_blank" class="btn btn-primary btn-lg">
+                                        <i class="fab fa-paypal me-2"></i>
+                                        Mit PayPal spenden
+                                    </a>
+                                    
+                                    <p class="text-muted mt-3 mb-0">
+                                        <small>Sie werden zu PayPal weitergeleitet</small>
+                                    </p>
+                                </div>
+                                
+                                <div class="alert alert-success mb-0">
+                                    <i class="fas fa-shield-alt me-2"></i>
+                                    <small>Sichere Zahlung über PayPal</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Info -->
+                <div class="card shadow-sm border-0 mb-4 bg-light">
+                    <div class="card-body p-4 text-center">
+                        <h4 class="mb-3">
+                            <i class="fas fa-file-invoice text-primary me-2"></i>
+                            Spendenbescheinigung
+                        </h4>
+                        <p class="mb-3">
+                            Der Lesezirkel Osnabrück e.V. ist als gemeinnütziger Verein anerkannt. 
+                            Ihre Spende ist steuerlich absetzbar.
+                        </p>
+                        <p class="mb-0">
+                            Für eine Spendenbescheinigung kontaktieren Sie uns bitte unter:<br>
+                            <a href="mailto:info@lesezirkel-osnabrueck.de" class="btn btn-outline-primary mt-2">
+                                <i class="fas fa-envelope me-2"></i>
+                                info@lz-os.de
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Thank You -->
+                <div class="text-center py-4">
+                    <h3 class="mb-3">
+                        <i class="fas fa-heart text-danger me-2"></i>
+                        Vielen Dank für Ihre Unterstützung!
+                    </h3>
+                    <p class="text-muted mb-4">
+                        Jede Spende, ob groß oder klein, hilft uns dabei, unsere Mission fortzusetzen.
+                    </p>
+                    <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Zurück zur Startseite
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function copyIBAN() {
+    const iban = "DE00 0000 0000 0000 0000 00";
+    navigator.clipboard.writeText(iban).then(() => {
+        alert("IBAN kopiert: " + iban);
+    }).catch(err => {
+        console.error('Fehler beim Kopieren: ', err);
+    });
+}
+</script>
+{% endblock %}

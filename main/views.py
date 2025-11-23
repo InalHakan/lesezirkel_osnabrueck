@@ -42,7 +42,7 @@ def home(request):
     """Home page view"""
     # Get upcoming events (not just featured ones) - all future events
     from datetime import datetime
-    upcoming_events = Event.objects.filter(date__gte=timezone.now()).order_by('date')[:8]  # Next 8 events
+    upcoming_events = Event.objects.filter(date__gte=timezone.now()).order_by('date')[:4]  # Next 4 events
     featured_news = News.objects.filter(is_featured=True)[:3]
     recent_gallery = Gallery.objects.all()[:6]
     
@@ -372,6 +372,11 @@ def contact(request):
         form = ContactForm()
 
     return render(request, 'main/contact.html', {'form': form})
+
+
+def donate(request):
+    """Donate page view"""
+    return render(request, 'main/donate.html')
 
 
 def impressum(request):
