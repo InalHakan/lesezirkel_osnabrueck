@@ -15,7 +15,7 @@ try:
 except ImportError:
     REPORTLAB_AVAILABLE = False
 
-from .models import Event, News, TeamMember, Gallery, Contact, EventRegistration, Document, Certificate, InvitationCode
+from .models import Event, News, TeamMember, Gallery, Contact, EventRegistration, Document, Certificate, InvitationCode, Announcement
 from .forms import EventRegistrationAdminForm, EventAdminForm, NewsAdminForm
 
 @admin.register(Event)
@@ -786,6 +786,47 @@ class CertificateAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request)
+
+
+@admin.register(Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
+    list_display = ['title', 'announcement_type', 'is_active', 'start_date', 'end_date', 'auto_close_seconds', 'is_currently_active_display']
+    list_filter = ['is_active', 'announcement_type', 'start_date', 'end_date']
+    search_fields = ['title', 'message']
+    list_editable = ['is_active']
+    readonly_fields = ['created_at', 'updated_at']
+    date_hierarchy = 'start_date'
+    ordering = ['-start_date']
+    
+    fieldsets = (
+        ('Grundinformationen', {
+            'fields': ('title', 'message', 'announcement_type', 'is_active')
+        }),
+        ('Medien', {
+            'fields': ('image', 'background_music'),
+            'description': 'Fügen Sie ein Bild und/oder Hintergrundmusik hinzu'
+        }),
+        ('Anzeigeeinstellungen', {
+            'fields': ('start_date', 'end_date', 'auto_close_seconds'),
+            'description': 'Legen Sie fest, wann und wie lange die Ankündigung angezeigt wird'
+        }),
+        ('Styling', {
+            'fields': ('background_color', 'text_color'),
+            'classes': ('collapse',),
+            'description': 'Passen Sie die Farben an (Hex-Format, z.B. #ffffff)'
+        }),
+        ('Zeitstempel', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def is_currently_active_display(self, obj):
+        """Display if announcement is currently active"""
+        if obj.is_currently_active():
+            return format_html('<span style="color: green; font-weight: bold;">✓ Aktiv</span>')
+        return format_html('<span style="color: gray;">○ Inaktiv</span>')
+    is_currently_active_display.short_description = 'Status jetzt'
 
 
 # Admin site title and header customization

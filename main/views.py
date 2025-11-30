@@ -10,7 +10,7 @@ import calendar
 import os
 import re
 from difflib import SequenceMatcher
-from .models import Event, News, TeamMember, Gallery, Contact, EventRegistration, Document, Certificate, InvitationCode
+from .models import Event, News, TeamMember, Gallery, Contact, EventRegistration, Document, Certificate, InvitationCode, Announcement
 from .forms import ContactForm
 from .document_utils import DocumentConverter
 
@@ -46,10 +46,18 @@ def home(request):
     featured_news = News.objects.filter(is_featured=True)[:3]
     recent_gallery = Gallery.objects.all()[:6]
     
+    # Get active announcement
+    active_announcement = Announcement.objects.filter(
+        is_active=True,
+        start_date__lte=timezone.now(),
+        end_date__gte=timezone.now()
+    ).first()
+    
     context = {
         'featured_events': upcoming_events,  # Keep same variable name for template compatibility
         'featured_news': featured_news,
         'recent_gallery': recent_gallery,
+        'active_announcement': active_announcement,
     }
     return render(request, 'main/home.html', context)
 

@@ -344,3 +344,80 @@ class Certificate(models.Model):
 
     def get_download_url(self):
         return reverse('certificate_download', kwargs={'pk': self.pk})
+
+
+class Announcement(models.Model):
+    """Pop-up announcement model for homepage"""
+    ANNOUNCEMENT_TYPES = [
+        ('event', 'Wichtiges Ereignis'),
+        ('invitation', 'Einladung'),
+        ('funeral', 'Traueranzeige'),
+        ('news', 'Wichtige Nachricht'),
+        ('warning', 'Warnung'),
+    ]
+    
+    title = models.CharField(max_length=200, verbose_name="Titel")
+    message = models.TextField(verbose_name="Nachricht", help_text="Haupttext der Ankündigung")
+    announcement_type = models.CharField(
+        max_length=20, 
+        choices=ANNOUNCEMENT_TYPES, 
+        default='news',
+        verbose_name="Typ"
+    )
+    image = models.ImageField(
+        upload_to='announcements/', 
+        blank=True, 
+        null=True, 
+        verbose_name="Bild",
+        help_text="Optionales Bild für die Ankündigung"
+    )
+    background_music = models.FileField(
+        upload_to='announcements/audio/', 
+        blank=True, 
+        null=True,
+        verbose_name="Hintergrundmusik",
+        help_text="Optionale Audiodatei (MP3, WAV)"
+    )
+    
+    # Display settings
+    is_active = models.BooleanField(default=True, verbose_name="Aktiv")
+    start_date = models.DateTimeField(verbose_name="Startdatum", help_text="Ab wann soll die Ankündigung angezeigt werden?")
+    end_date = models.DateTimeField(verbose_name="Enddatum", help_text="Bis wann soll die Ankündigung angezeigt werden?")
+    auto_close_seconds = models.PositiveIntegerField(
+        default=10, 
+        verbose_name="Automatisches Schließen (Sekunden)",
+        help_text="Nach wie vielen Sekunden soll das Pop-up automatisch schließen? (0 = nie)"
+    )
+    
+    # Styling
+    background_color = models.CharField(
+        max_length=7, 
+        default='#ffffff',
+        verbose_name="Hintergrundfarbe",
+        help_text="Hex-Farbe (z.B. #ffffff)"
+    )
+    text_color = models.CharField(
+        max_length=7,
+        default='#000000', 
+        verbose_name="Textfarbe",
+        help_text="Hex-Farbe (z.B. #000000)"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Ankündigung"
+        verbose_name_plural = "Ankündigungen"
+        ordering = ['-start_date']
+    
+    def __str__(self):
+        return f"{self.title} ({self.get_announcement_type_display()})"
+    
+    def is_currently_active(self):
+        """Check if announcement should be shown now"""
+        now = timezone.now()
+        return (
+            self.is_active and 
+            self.start_date <= now <= self.end_date
+        )
