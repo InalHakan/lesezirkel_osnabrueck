@@ -48,27 +48,26 @@ body {
     color: var(--dark-color) !important;
     transition: var(--transition);
     position: relative;
+    padding: 0.5rem 1rem !important;
+    display: inline-flex !important;
+    align-items: center;
+    white-space: nowrap;
 }
 
 .nav-link:hover {
     color: var(--primary-color) !important;
-    transform: translateY(-2px);
 }
 
-.nav-link::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: 0;
-    left: 50%;
-    background-color: var(--primary-color);
-    transition: var(--transition);
-    transform: translateX(-50%);
+.nav-link.active {
+    color: var(--primary-color) !important;
+    font-weight: 600;
 }
 
-.nav-link:hover::after {
-    width: 100%;
+.nav-link i {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Navigation Dropdown Styles */

@@ -38,7 +38,7 @@
                         <a class="nav-link" href="{% url 'home' %}">Startseite</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'about' %}">Über uns</a>
+                        <a class="nav-link" href="{% url 'about' %}">Über&nbsp;uns</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'events' %}">Veranstaltungen</a>
@@ -56,15 +56,14 @@
                         <a class="nav-link" href="{% url 'contact' %}">Kontakt</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-danger fw-semibold" href="{% url 'donate' %}">
-                            <i class="fas fa-heart me-1"></i>Spenden
+                        <a class="nav-link text-danger fw-semibold d-flex align-items-center" href="{% url 'donate' %}">
+                            <i class="fas fa-heart me-2"></i><span>Spenden</span>
                         </a>
                     </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user me-1"></i>
-                                {{ user.first_name|default:user.username }}
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-2"></i><span>{{ user.first_name|default:user.username }}</span>
                             </a>
                             <ul class="dropdown-menu">
                                 {% if user.is_staff %}
@@ -84,8 +83,8 @@
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}?next={{ request.path }}">
-                                <i class="fas fa-sign-in-alt me-1"></i>Anmelden
+                            <a class="nav-link d-flex align-items-center" href="{% url 'login' %}?next={{ request.path }}">
+                                <i class="fas fa-sign-in-alt me-2"></i><span>Anmelden</span>
                             </a>
                         </li>
                     {% endif %}
