@@ -1,0 +1,43 @@
+# Passenger WSGI için Apache/Nginx yapılandırması
+# All-Inkl Passenger
+
+PassengerEnabled on
+PassengerAppRoot /www/htdocs/w016e54c
+
+# Python executable path - venv oluşturulunca bu satırı açacağız
+# PassengerPython /www/htdocs/w016e54c/venv/bin/python3
+
+# Şimdilik sistem Python kullan
+PassengerPython /usr/bin/python3
+
+# WSGI file
+PassengerStartupFile passenger_wsgi.py
+
+# Environment
+SetEnv DJANGO_SETTINGS_MODULE lesezirkel_osnabrueck.settings_production
+SetEnv DJANGO_PRODUCTION 1
+
+# Static files
+Alias /static /www/htdocs/w016e54c/staticfiles
+<Directory /www/htdocs/w016e54c/staticfiles>
+    Require all granted
+</Directory>
+
+# Media files
+Alias /media /www/htdocs/w016e54c/media
+<Directory /www/htdocs/w016e54c/media>
+    Require all granted
+</Directory>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "same-origin"
+</IfModule>
+
+# Gzip compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>

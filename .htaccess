@@ -1,0 +1,40 @@
+# Passenger WSGI için Apache/Nginx yapılandırması
+# All-Inkl genellikle Passenger kullanır
+
+PassengerEnabled on
+PassengerAppRoot /www/htdocs/lesezirkel_osnabrueck
+
+# Python executable path
+PassengerPython /www/htdocs/lesezirkel_osnabrueck/venv/bin/python3
+
+# WSGI file
+PassengerStartupFile passenger_wsgi.py
+
+# Environment
+SetEnv DJANGO_SETTINGS_MODULE lesezirkel_osnabrueck.settings_production
+SetEnv DJANGO_PRODUCTION 1
+
+# Static files
+Alias /static /www/htdocs/lesezirkel_osnabrueck/staticfiles
+<Directory /www/htdocs/lesezirkel_osnabrueck/staticfiles>
+    Require all granted
+</Directory>
+
+# Media files
+Alias /media /www/htdocs/lesezirkel_osnabrueck/media
+<Directory /www/htdocs/lesezirkel_osnabrueck/media>
+    Require all granted
+</Directory>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "same-origin"
+</IfModule>
+
+# Gzip compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
