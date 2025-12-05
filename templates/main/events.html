@@ -2,7 +2,7 @@
 {% load static %}
 {% load calendar_tags %}
 
-{% block title %}Veranstaltungen - Lesezirkel Osnabrück e.V.{% endblock %}
+{% block title %}Veranstaltungen - Lesezirkel der Friedensstatt Osnabrück e.V.{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -409,6 +409,112 @@
     border-radius: 50%;
     margin-right: 0.5rem;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .calendar-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .calendar-grid {
+        min-width: 100%;
+        font-size: 0.75rem;
+    }
+    
+    .calendar-day {
+        min-height: 80px;
+        padding: 0.25rem;
+    }
+    
+    .calendar-day-header {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.75rem;
+    }
+    
+    .day-number {
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .event-title-link {
+        font-size: 0.65rem;
+        padding: 1px 2px;
+        margin: 1px 0;
+    }
+    
+    .event-time {
+        font-size: 0.55rem;
+    }
+    
+    /* Hide event previews on mobile - use click instead */
+    .event-preview {
+        display: none;
+    }
+    
+    .month-navigation h2 {
+        font-size: 1.25rem;
+    }
+    
+    .nav-arrow {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .calendar-grid {
+        font-size: 0.7rem;
+    }
+    
+    .calendar-day {
+        min-height: 70px;
+        padding: 0.2rem;
+    }
+    
+    .calendar-day-header {
+        padding: 0.4rem 0.2rem;
+        font-size: 0.7rem;
+    }
+    
+    .day-number {
+        font-size: 0.8rem;
+    }
+    
+    .event-title-link {
+        font-size: 0.6rem;
+        padding: 1px;
+    }
+    
+    .month-navigation h2 {
+        font-size: 1.1rem;
+    }
+    
+    .legend {
+        padding: 0.75rem;
+    }
+    
+    .legend-item {
+        font-size: 0.8rem;
+        margin: 0.3rem 0.5rem 0.3rem 0;
+    }
+    
+    .legend-dot {
+        width: 10px;
+        height: 10px;
+    }
+    
+    /* Stack event list items vertically on mobile */
+    .event-item .row > div {
+        text-align: center !important;
+        margin-bottom: 1rem;
+    }
+    
+    .event-item .row > div:last-child {
+        margin-bottom: 0;
+    }
+}
 </style>
 {% endblock %}
 
@@ -417,11 +523,11 @@
 <section class="bg-primary text-white py-5">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-8">
+            <div class="col-lg-8 col-md-7 mb-3 mb-lg-0">
                 <h1 class="display-4 fw-bold mb-3">Veranstaltungen</h1>
                 <p class="lead mb-0">Finden Sie unsere interkulturellen Veranstaltungen im Kalender</p>
             </div>
-            <div class="col-lg-4 text-end">
+            <div class="col-lg-4 col-md-5 text-lg-end text-center">
                 {% if user.is_authenticated and user.is_staff %}
                     <a href="{% url 'admin:main_event_add' %}" class="btn btn-light btn-lg">
                         <i class="fas fa-plus me-2"></i>

@@ -46,12 +46,14 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # For serving static files
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'main.middleware.NeverCacheAuthenticatedMiddleware',  # Prevent caching for authenticated users
     'django.middleware.locale.LocaleMiddleware',  # Language selection middleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'main.middleware.ClearSessionOnLogoutMiddleware',  # Clear session on logout
 ]
 
 ROOT_URLCONF = 'lesezirkel_osnabrueck.urls'
@@ -139,10 +141,38 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# File Upload Settings
+# Maximum size for uploaded files (in bytes)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB (default is 2.5 MB)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB (default is 2.5 MB)
+# For even larger files, increase these values:
+# DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
+# FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Session Configuration
+# Session expires when browser is closed
+SESSION_COOKIE_AGE = 3600  # 1 hour in seconds (reduced from 24h)
+SESSION_SAVE_EVERY_REQUEST = True  # Update session on every request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Session expires when browser closes
+SESSION_COOKIE_SECURE = not DEBUG  # Use secure cookies in production (HTTPS)
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
+SESSION_COOKIE_SAMESITE = 'Strict'  # Strict CSRF protection
+SESSION_COOKIE_NAME = 'lesezirkel_sessionid'  # Custom session cookie name
+
+# CSRF Configuration
+CSRF_COOKIE_SECURE = not DEBUG  # Use secure CSRF cookie in production
+CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript access to CSRF cookie
+CSRF_COOKIE_SAMESITE = 'Strict'
+CSRF_COOKIE_NAME = 'lesezirkel_csrftoken'  # Custom CSRF cookie name
+
+# Cache Control - Prevent browser caching of authenticated pages
+CACHE_MIDDLEWARE_SECONDS = 0
+CACHE_MIDDLEWARE_KEY_PREFIX = ''
 
 # Logging configuration
 LOGGING = {
@@ -207,9 +237,9 @@ MESSAGE_TAGS = {
 # Jazzmin Admin Theme Configuration
 JAZZMIN_SETTINGS = {
     # Title on the login screen and header
-    "site_title": "Lesezirkel Osnabrück Admin",
-    "site_header": "Lesezirkel Osnabrück e.V.",
-    "site_brand": "Lesezirkel der Friedensstadt Osnabrück",
+    "site_title": "Lesezirkel Admin",
+    "site_header": "Lesezirkel",
+    "site_brand": "Lesezirkel",
     
     # Logo to use for your site (path relative to STATIC_URL)
     "site_logo": "images/logo.png",

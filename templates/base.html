@@ -5,7 +5,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Lesezirkel Osnabrück e.V.{% endblock %}</title>
+    <title>{% block title %}Lesezirkel der Friedensstatt Osnabrück e.V.{% endblock %}</title>
+    
+    <!-- Prevent caching for authenticated users -->
+    {% if user.is_authenticated %}
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    {% endif %}
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
@@ -27,7 +34,10 @@
         <div class="container">
             <a class="navbar-brand fw-bold text-primary d-flex align-items-center" href="{% url 'home' %}">
                 <img src="{% static_with_version 'images/logo.png' %}" alt="Lesezirkel Logo" style="height: 65px; width: auto;" class="me-2">
-                Lesezirkel Osnabrück e. V.
+                <div class="d-flex flex-column lh-sm">
+                    <span class="brand-main" style="font-size: 2rem; font-weight: 700;">Lesezirkel</span>
+                    <span class="brand-subtitle" style="font-size: 0.85rem; font-weight: 500; opacity: 0.85;">der FriedensstattOsnabrück e. V.</span>
+                </div>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -38,7 +48,7 @@
                         <a class="nav-link" href="{% url 'home' %}">Startseite</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'about' %}">Über&nbsp;uns</a>
+                        <a class="nav-link" href="{% url 'about' %}">Über uns</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'events' %}">Veranstaltungen</a>
@@ -75,7 +85,7 @@
                                     <li><hr class="dropdown-divider"></li>
                                 {% endif %}
                                 <li>
-                                    <a class="dropdown-item" href="{% url 'admin:logout' %}">
+                                    <a class="dropdown-item" href="{% url 'logout' %}?next=/">
                                         <i class="fas fa-sign-out-alt me-2"></i>Abmelden
                                     </a>
                                 </li>
@@ -116,7 +126,7 @@
                 <div class="col-lg-4 col-md-6 mb-4">
                     <h5 class="mb-3 d-flex align-items-center text-white">
                         <img src="{% static 'images/logo.png' %}" alt="Lesezirkel Logo" style="height: 32px; width: auto;" class="me-2">
-                        Lesezirkel Osnabrück e.V.
+                        Lesezirkel der Friedensstatt Osnabrück e.V.
                     </h5>
                     <p class="text-light opacity-75">
                         Wir setzen uns für eine offene, demokratische und vielfältige Gesellschaft ein. 

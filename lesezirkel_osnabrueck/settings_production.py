@@ -87,9 +87,28 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
 # HTTPS settings (if using HTTPS)
-# SECURE_SSL_REDIRECT = True
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True  # HTTPS yönlendirmesi
+SESSION_COOKIE_SECURE = True  # Session cookie'lerini güvenli yap
+CSRF_COOKIE_SECURE = True  # CSRF cookie'lerini güvenli yap
+SESSION_COOKIE_HTTPONLY = True  # JavaScript erişimini engelle
+CSRF_COOKIE_HTTPONLY = True  # JavaScript erişimini engelle
+SESSION_COOKIE_SAMESITE = 'Strict'  # CSRF koruması
+CSRF_COOKIE_SAMESITE = 'Strict'
+SESSION_COOKIE_NAME = 'lesezirkel_sessionid'  # Özel session cookie adı
+CSRF_COOKIE_NAME = 'lesezirkel_csrftoken'  # Özel CSRF cookie adı
+
+# Session Configuration
+SESSION_COOKIE_AGE = 3600  # 1 saat
+SESSION_SAVE_EVERY_REQUEST = True  # Her istekte session'ı güncelle
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Tarayıcı kapanınca session sona ersin
+
+# Cache Control - Authenticated sayfaların cache'lenmesini engelle
+CACHE_MIDDLEWARE_SECONDS = 0
+CACHE_MIDDLEWARE_KEY_PREFIX = ''
+
+# File Upload Settings - settings.py ile aynı
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 
 # Logging - All-Inkl uyumlu
 LOGGING = {
@@ -140,3 +159,143 @@ SERVER_EMAIL = 'noreply@lesezirkel-os.de'
 # EMAIL_USE_TLS = True
 # EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
 # EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
+
+# Authentication settings
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/events/'
+LOGOUT_REDIRECT_URL = '/'
+
+# Django Messages Framework - Bootstrap 5 compatibility
+from django.contrib.messages import constants as message_constants
+MESSAGE_TAGS = {
+    message_constants.DEBUG: 'secondary',
+    message_constants.INFO: 'info',
+    message_constants.SUCCESS: 'success',
+    message_constants.WARNING: 'warning',
+    message_constants.ERROR: 'danger',  # Bootstrap uses 'danger' for error (red)
+}
+
+# Jazzmin Admin Theme Configuration
+JAZZMIN_SETTINGS = {
+    # Title on the login screen and header
+    "site_title": "Lesezirkel Admin",
+    "site_header": "Lesezirkel",
+    "site_brand": "Lesezirkel",
+    
+    # Logo to use for your site (path relative to STATIC_URL)
+    "site_logo": "images/logo.png",
+    "login_logo": "images/logo.png",
+    
+    # Logo to use for login form in dark themes
+    "login_logo_dark": None,
+    
+    # CSS classes to add to site logo
+    "site_logo_classes": "img-circle",
+    
+    # Relative path to a favicon
+    "site_icon": None,
+    
+    # Welcome text on the login screen
+    "welcome_sign": "Willkommen im Admin-Bereich",
+    
+    # Copyright on the footer
+    "copyright": "Lesezirkel Osnabrück e.V. 2025",
+    
+    # The model admin to search from the search bar
+    "search_model": ["auth.User", "main.Event", "main.News"],
+    
+    # Field name on user model that contains avatar image
+    "user_avatar": None,
+    
+    ############
+    # Top Menu #
+    ############
+    
+    # Links to put along the top menu
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Website", "url": "/", "new_window": True},
+        {"model": "auth.User"},
+        {"app": "main"},
+    ],
+    
+    #############
+    # Side Menu #
+    #############
+    
+    # Whether to display the side menu
+    "show_sidebar": True,
+    
+    # Whether to aut expand the menu
+    "navigation_expanded": True,
+    
+    # Custom icons for side menu apps/models
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "main.Event": "fas fa-calendar-alt",
+        "main.News": "fas fa-newspaper",
+        "main.TeamMember": "fas fa-user-tie",
+        "main.Gallery": "fas fa-images",
+        "main.Contact": "fas fa-envelope",
+        "main.EventRegistration": "fas fa-user-check",
+        "main.Document": "fas fa-file-alt",
+        "main.Certificate": "fas fa-certificate",
+    },
+    
+    # Icons that are used when one is not manually specified
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+    
+    #################
+    # Related Modal #
+    #################
+    "related_modal_active": False,
+    
+    #############
+    # UI Tweaks #
+    #############
+    
+    # Render out the change view as a single form, or in tabs
+    "changeform_format": "horizontal_tabs",
+    
+    # Override change forms on a per modeladmin basis
+    "changeform_format_overrides": {
+        "auth.user": "collapsible",
+        "auth.group": "vertical_tabs",
+    },
+}
+
+# Jazzmin UI Tweaks
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-primary",
+    "accent": "accent-primary",
+    "navbar": "navbar-white navbar-light",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_nav_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success",
+    },
+}

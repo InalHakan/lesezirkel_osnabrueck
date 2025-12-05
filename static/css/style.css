@@ -43,15 +43,29 @@ body {
     color: var(--primary-color) !important;
 }
 
+.brand-main {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.brand-subtitle {
+    font-size: 0.7rem;
+    font-weight: 500;
+    opacity: 0.85;
+    line-height: 1.2;
+}
+
 .nav-link {
     font-weight: 500;
     color: var(--dark-color) !important;
     transition: var(--transition);
     position: relative;
-    padding: 0.5rem 1rem !important;
+    padding: 0.5rem 0.75rem !important;
     display: inline-flex !important;
     align-items: center;
     white-space: nowrap;
+    font-size: 0.95rem;
 }
 
 .nav-link:hover {
@@ -1138,6 +1152,33 @@ footer {
 }
 
 /* Responsive Design */
+@media (max-width: 991px) {
+    .navbar-collapse {
+        background: white;
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        margin-top: 0.5rem;
+        box-shadow: var(--box-shadow);
+    }
+    
+    .nav-link {
+        padding: 0.75rem 1rem !important;
+        border-bottom: 1px solid #f0f0f0;
+        white-space: normal !important;
+        word-wrap: break-word;
+    }
+    
+    .nav-link:last-child {
+        border-bottom: none;
+    }
+    
+    .dropdown-menu {
+        border: none;
+        box-shadow: none;
+        padding-left: 1rem;
+    }
+}
+
 @media (max-width: 768px) {
     .hero-title {
         font-size: 2.5rem;
@@ -1199,6 +1240,19 @@ footer {
 @media (max-width: 576px) {
     body {
         padding-top: 66px;
+    }
+    
+    /* Mobile navbar brand adjustments */
+    .brand-main {
+        font-size: 1.25rem !important;
+    }
+    
+    .brand-subtitle {
+        font-size: 0.65rem !important;
+    }
+    
+    .navbar-brand img {
+        height: 45px !important;
     }
     
     .hero-title {

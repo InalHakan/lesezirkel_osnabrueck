@@ -44,7 +44,6 @@ def home(request):
     from datetime import datetime
     upcoming_events = Event.objects.filter(date__gte=timezone.now()).order_by('date')[:4]  # Next 4 events
     featured_news = News.objects.filter(is_featured=True)[:3]
-    recent_gallery = Gallery.objects.all()[:6]
     
     # Get active announcement
     active_announcement = Announcement.objects.filter(
@@ -53,10 +52,56 @@ def home(request):
         end_date__gte=timezone.now()
     ).first()
     
+    # Build hero gallery images with priority:
+    # 1. Event images (upcoming events with images)
+    # 2. Gallery images
+    # 3. News images
+    hero_gallery = []
+    
+    # 1. Add upcoming event images first (with image)
+    events_with_images = Event.objects.filter(
+        date__gte=timezone.now(),
+        image__isnull=False
+    ).exclude(image='').order_by('date')[:6]
+    
+    for event in events_with_images:
+        hero_gallery.append({
+            'image': event.image,
+            'title': event.title,
+            'type': 'event'
+        })
+    
+    # 2. Add gallery images if we need more
+    if len(hero_gallery) < 6:
+        gallery_items = Gallery.objects.all()[:6 - len(hero_gallery)]
+        for item in gallery_items:
+            hero_gallery.append({
+                'image': item.image,
+                'title': item.title,
+                'type': 'gallery'
+            })
+    
+    # 3. Add news images if we still need more
+    if len(hero_gallery) < 6:
+        news_with_images = News.objects.filter(
+            image__isnull=False
+        ).exclude(image='').order_by('-published_date')[:6 - len(hero_gallery)]
+        
+        for news in news_with_images:
+            hero_gallery.append({
+                'image': news.image,
+                'title': news.title,
+                'type': 'news'
+            })
+    
+    # Keep recent_gallery for backward compatibility (lower section)
+    recent_gallery = Gallery.objects.all()[:6]
+    
     context = {
         'featured_events': upcoming_events,  # Keep same variable name for template compatibility
         'featured_news': featured_news,
         'recent_gallery': recent_gallery,
+        'hero_gallery': hero_gallery,  # New: prioritized gallery for hero section
         'active_announcement': active_announcement,
     }
     return render(request, 'main/home.html', context)

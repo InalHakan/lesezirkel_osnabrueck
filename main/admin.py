@@ -18,8 +18,48 @@ except ImportError:
 from .models import Event, News, TeamMember, Gallery, Contact, EventRegistration, Document, Certificate, InvitationCode, Announcement
 from .forms import EventRegistrationAdminForm, EventAdminForm, NewsAdminForm
 
+# Base admin mixin for file upload help text
+class FileUploadHelpMixin:
+    """Mixin to add helpful file upload messages to admin forms"""
+    
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        
+        # List of file/image fields to add help text to
+        file_fields = ['image', 'file', 'certificate_file', 'photo', 'background_music']
+        
+        for field_name in file_fields:
+            if field_name in form.base_fields:
+                field = form.base_fields[field_name]
+                
+                if obj and hasattr(obj, field_name):
+                    file_obj = getattr(obj, field_name)
+                    if file_obj:
+                        try:
+                            file_name = file_obj.name.split('/')[-1]
+                            file_url = file_obj.url
+                            field.help_text = (
+                                f'Aktuelle Datei: <a href="{file_url}" target="_blank">{file_name}</a><br>'
+                                f'<strong>⚠️ Wichtig:</strong> Bei Formularfehlern müssen Sie die Datei erneut auswählen (Browser-Sicherheitsrichtlinie).<br>'
+                                f'<strong>💡 Tipp:</strong> Prüfen Sie alle anderen Felder bevor Sie eine neue Datei hochladen.'
+                            )
+                        except (ValueError, AttributeError):
+                            pass
+                else:
+                    # For new objects
+                    if not field.help_text or 'Tipp' not in str(field.help_text):
+                        original_help = field.help_text or ''
+                        field.help_text = (
+                            f'{original_help}<br>' if original_help else '' +
+                            '<strong>💡 Tipp:</strong> Füllen Sie zuerst alle anderen Felder korrekt aus, '
+                            'bevor Sie eine Datei hochladen. Bei Formularfehlern müssen Sie die Datei erneut auswählen.'
+                        )
+        
+        return form
+
+
 @admin.register(Event)
-class EventAdmin(admin.ModelAdmin):
+class EventAdmin(FileUploadHelpMixin, admin.ModelAdmin):
     form = EventAdminForm  # Use custom form with German date format
     list_display = ['title', 'date', 'location', 'category', 'is_featured', 'is_public', 'registration_required', 'invitation_only', 'created_at']
     list_filter = ['category', 'is_featured', 'is_public', 'registration_required', 'invitation_only', 'date', 'created_at']
@@ -28,6 +68,9 @@ class EventAdmin(admin.ModelAdmin):
     date_hierarchy = 'date'
     ordering = ['-date']
     actions = ['export_event_participant_list', 'export_event_participant_list_pdf']
+    
+    class Media:
+        js = ('admin/js/file_size_validator.js',)
     
     fieldsets = (
         ('Grundinformationen', {
@@ -66,7 +109,7 @@ class EventAdmin(admin.ModelAdmin):
     export_event_participant_list_pdf.short_description = "📄 Teilnehmerliste als PDF exportieren"
 
 @admin.register(News)
-class NewsAdmin(admin.ModelAdmin):
+class NewsAdmin(FileUploadHelpMixin, admin.ModelAdmin):
     form = NewsAdminForm  # Use custom form with German date format
     list_display = ['title', 'published_date', 'is_featured', 'created_at']
     list_filter = ['is_featured', 'published_date', 'created_at']
@@ -74,22 +117,31 @@ class NewsAdmin(admin.ModelAdmin):
     list_editable = ['is_featured']
     date_hierarchy = 'published_date'
     ordering = ['-published_date']
+    
+    class Media:
+        js = ('admin/js/file_size_validator.js',)
 
 @admin.register(TeamMember)
-class TeamMemberAdmin(admin.ModelAdmin):
+class TeamMemberAdmin(FileUploadHelpMixin, admin.ModelAdmin):
     list_display = ['name', 'position', 'email', 'order']
     list_filter = ['position']
     search_fields = ['name', 'position', 'email']
     list_editable = ['order']
     ordering = ['order', 'name']
+    
+    class Media:
+        js = ('admin/js/file_size_validator.js',)
 
 @admin.register(Gallery)
-class GalleryAdmin(admin.ModelAdmin):
+class GalleryAdmin(FileUploadHelpMixin, admin.ModelAdmin):
     list_display = ['title', 'event', 'created_at']
     list_filter = ['event', 'created_at']
     search_fields = ['title', 'description']
     date_hierarchy = 'created_at'
     ordering = ['-created_at']
+    
+    class Media:
+        js = ('admin/js/file_size_validator.js',)
 
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
@@ -342,7 +394,7 @@ class EventRegistrationAdmin(admin.ModelAdmin):
         html_content += f"""
             <div class="print-info">
                 <p><em>Teilnehmerliste erstellt am {datetime.now().strftime('%d.%m.%Y um %H:%M')} | 
-                Lesezirkel Osnabrück e.V.</em></p>
+                Lesezirkel der Friedensstatt Osnabrück e.V.</em></p>
             </div>
         </body>
         </html>
@@ -729,7 +781,7 @@ class EventRegistrationAdmin(admin.ModelAdmin):
 
 
 @admin.register(Document)
-class DocumentAdmin(admin.ModelAdmin):
+class DocumentAdmin(FileUploadHelpMixin, admin.ModelAdmin):
     list_display = ['title', 'category', 'file_extension', 'formatted_file_size', 'download_count', 'is_featured', 'is_public', 'created_at']
     list_filter = ['category', 'is_featured', 'is_public', 'created_at']
     search_fields = ['title', 'description']
@@ -737,6 +789,9 @@ class DocumentAdmin(admin.ModelAdmin):
     readonly_fields = ['file_size', 'download_count', 'created_at', 'updated_at']
     date_hierarchy = 'created_at'
     ordering = ['-created_at']
+    
+    class Media:
+        js = ('admin/js/file_size_validator.js',)
     
     fieldsets = (
         ('Dokumentinformationen', {
@@ -761,12 +816,15 @@ class DocumentAdmin(admin.ModelAdmin):
 
 
 @admin.register(Certificate)
-class CertificateAdmin(admin.ModelAdmin):
+class CertificateAdmin(FileUploadHelpMixin, admin.ModelAdmin):
     list_display = ['participant_number', 'first_name', 'last_name', 'event_title', 'completion_date', 'created_at']
     list_filter = ['completion_date', 'event_title', 'created_at']
     search_fields = ['first_name', 'last_name', 'participant_number', 'event_title']
     ordering = ['-completion_date', 'last_name', 'first_name']
     readonly_fields = ['created_at', 'updated_at']
+    
+    class Media:
+        js = ('admin/js/file_size_validator.js',)
     
     fieldsets = (
         ('Teilnehmerinformationen', {
@@ -789,7 +847,7 @@ class CertificateAdmin(admin.ModelAdmin):
 
 
 @admin.register(Announcement)
-class AnnouncementAdmin(admin.ModelAdmin):
+class AnnouncementAdmin(FileUploadHelpMixin, admin.ModelAdmin):
     list_display = ['title', 'announcement_type', 'is_active', 'start_date', 'end_date', 'auto_close_seconds', 'is_currently_active_display']
     list_filter = ['is_active', 'announcement_type', 'start_date', 'end_date']
     search_fields = ['title', 'message']
@@ -830,6 +888,6 @@ class AnnouncementAdmin(admin.ModelAdmin):
 
 
 # Admin site title and header customization
-admin.site.site_header = "Lesezirkel Osnabrück Admin"
+admin.site.site_header = "Lesezirkel Admin"
 admin.site.site_title = "Lesezirkel Admin"
 admin.site.index_title = "Verwaltungspanel"

@@ -1,17 +1,24 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Herunterladen - Lesezirkel Osnabrück{% endblock %}
+{% block title %}Herunterladen - Lesezirkel der Friedensstatt Osnabrück e.V.{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <!-- Page Header -->
-    <div class="row mb-5">
-        <div class="col-12 text-center">
-            <h1 class="display-4 text-primary">Herunterladen</h1>
-            <p class="lead">Laden Sie wichtige Dokumente, Formulare und Informationsmaterial herunter</p>
+<!-- Page Header -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-3">Herunterladen</h1>
+                <p class="lead">Laden Sie wichtige Dokumente, Formulare und Informationsmaterial herunter</p>
+            </div>
         </div>
     </div>
+</section>
+
+<!-- Main Content -->
+<section class="section">
+    <div class="container">
 
     <!-- Category Filter -->
     <div class="row mb-4">
@@ -197,5 +204,6 @@
             </div>
         </div>
     </div>
-</div>
+    </div>
+</section>
 {% endblock %}

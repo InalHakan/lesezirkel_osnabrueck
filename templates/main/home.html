@@ -2,7 +2,7 @@
 {% load static %}
 {% load calendar_tags %}
 
-{% block title %}Startseite - Lesezirkel Osnabrück e.V.{% endblock %}
+{% block title %}Startseite - Lesezirkel der Friedensstadt Osnabrück e.V.{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
@@ -25,11 +25,11 @@
             
             <!-- Center: Auto-sliding Gallery Carousel with Reflection -->
             <div class="col-lg-4">
-                {% if recent_gallery %}
+                {% if hero_gallery %}
                 <div class="hero-gallery-section">
                     <div id="heroGalleryCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="8000">
                         <div class="carousel-inner">
-                            {% for item in recent_gallery|slice:":6" %}
+                            {% for item in hero_gallery %}
                             <div class="carousel-item {% if forloop.first %}active{% endif %}">
                                 <div class="gallery-reflection-container">
                                     <img src="{{ item.image.url }}" alt="{{ item.title }}" class="hero-gallery-img">

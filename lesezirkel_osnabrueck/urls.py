@@ -25,12 +25,29 @@ from django.views.decorators.cache import never_cache
 # Admin logout view that properly clears session
 @never_cache
 def admin_logout_view(request):
-    """Custom logout view for admin that properly clears session"""
+    """Custom logout view for admin that properly clears session and cookies"""
+    # Clear session data
+    if hasattr(request, 'session'):
+        request.session.flush()
+    
+    # Perform logout
     logout(request)
-    # Clear any remaining session data
-    request.session.flush()
-    # Redirect to admin login page
-    return redirect('/admin/login/')
+    
+    # Create response - redirect to homepage
+    response = redirect('/')
+    
+    # Clear all authentication cookies
+    response.delete_cookie('sessionid')
+    response.delete_cookie('lesezirkel_sessionid')
+    response.delete_cookie('csrftoken')
+    response.delete_cookie('lesezirkel_csrftoken')
+    
+    # Add cache control headers
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    
+    return response
 
 # Ana URL yapısı (çok dilli sistem kaldırıldı)
 urlpatterns = [
