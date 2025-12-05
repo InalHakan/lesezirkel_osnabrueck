@@ -853,6 +853,7 @@ body {
 .card-img-top {
     height: 250px;
     object-fit: cover;
+    object-position: center center; /* Resmi ortadan göster, üstten kesme */
     transition: var(--transition);
 }
 
