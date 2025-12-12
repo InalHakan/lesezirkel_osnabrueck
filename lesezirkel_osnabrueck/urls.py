@@ -19,8 +19,37 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import logout
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_http_methods
+
+# Logout view that handles both GET and POST
+@never_cache
+@require_http_methods(["GET", "POST"])
+def custom_logout_view(request):
+    """Custom logout view that handles both GET and POST requests"""
+    # Clear session data
+    if hasattr(request, 'session'):
+        request.session.flush()
+    
+    # Perform logout
+    logout(request)
+    
+    # Create response - render logged_out template
+    response = render(request, 'registration/logged_out.html')
+    
+    # Clear all authentication cookies
+    response.delete_cookie('sessionid')
+    response.delete_cookie('lesezirkel_sessionid')
+    response.delete_cookie('csrftoken')
+    response.delete_cookie('lesezirkel_csrftoken')
+    
+    # Add cache control headers
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    
+    return response
 
 # Admin logout view that properly clears session
 @never_cache
@@ -53,7 +82,8 @@ def admin_logout_view(request):
 urlpatterns = [
     path('admin/logout/', admin_logout_view, name='admin_logout'),
     path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/logout/', custom_logout_view, name='logout'),  # Custom logout view
+    path('accounts/', include('django.contrib.auth.urls')),  # Other auth views (login, password reset, etc.)
     path('', include('main.urls')),
 ]
 

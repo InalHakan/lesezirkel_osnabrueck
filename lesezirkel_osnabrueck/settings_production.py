@@ -22,8 +22,10 @@ DEBUG = False
 ALLOWED_HOSTS = [
     'lesezirkel-os.de',
     'www.lesezirkel-os.de',
-    # Sunucu IP adresinizi buraya ekleyin
-    # Örnek: '123.456.789.012'
+    '95.216.100.62',
+    'veraxic.com',
+    'localhost',
+    '127.0.0.1',
 ]
 
 # Database for production
@@ -32,10 +34,18 @@ DB_ENGINE = os.environ.get('DB_ENGINE', 'sqlite')
 
 if DB_ENGINE == 'sqlite':
     # SQLite - Basit ve hızlı kurulum
+    # Veritabanını ayrı bir klasörde sakla (izin sorunlarını önlemek için)
+    DB_DIR = os.path.join(BASE_DIR, 'db')
+    if not os.path.exists(DB_DIR):
+        try:
+            os.makedirs(DB_DIR, mode=0o775)
+        except OSError:
+            pass
+    
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'NAME': os.path.join(DB_DIR, 'lesezirkel_osnabrueck.sqlite3'),
         }
     }
 elif DB_ENGINE == 'mysql':
@@ -111,6 +121,24 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 
 # Logging - All-Inkl uyumlu
+# Logs klasörünün varlığını kontrol et ve oluştur
+LOGS_DIR = os.path.join(BASE_DIR, 'logs')
+LOGS_AVAILABLE = False
+
+try:
+    if not os.path.exists(LOGS_DIR):
+        os.makedirs(LOGS_DIR, mode=0o775)
+    # Test yazma izni
+    test_file = os.path.join(LOGS_DIR, '.write_test')
+    with open(test_file, 'w') as f:
+        f.write('test')
+    os.remove(test_file)
+    LOGS_AVAILABLE = True
+except (OSError, PermissionError):
+    # Log dosyaları kullanılamıyorsa sadece console kullan
+    LOGS_AVAILABLE = False
+
+# Logging yapılandırması
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -121,32 +149,42 @@ LOGGING = {
         },
     },
     'handlers': {
-        'file': {
+        'console': {
             'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'production.log'),
-            'formatter': 'verbose',
-        },
-        'error_file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'error.log'),
+            'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'error_file'],
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': True,
         },
         'main': {
-            'handlers': ['file', 'error_file'],
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': False,
         },
     },
 }
+
+# Eğer log dosyaları yazılabilirse ekle
+if LOGS_AVAILABLE:
+    LOGGING['handlers']['file'] = {
+        'level': 'INFO',
+        'class': 'logging.FileHandler',
+        'filename': os.path.join(LOGS_DIR, 'production.log'),
+        'formatter': 'verbose',
+    }
+    LOGGING['handlers']['error_file'] = {
+        'level': 'ERROR',
+        'class': 'logging.FileHandler',
+        'filename': os.path.join(LOGS_DIR, 'error.log'),
+        'formatter': 'verbose',
+    }
+    LOGGING['loggers']['django']['handlers'].extend(['file', 'error_file'])
+    LOGGING['loggers']['main']['handlers'].extend(['file', 'error_file'])
 
 # Email ayarları (hata bildirimleri için)
 ADMINS = [('Admin', 'info@lesezirkel-os.de')]

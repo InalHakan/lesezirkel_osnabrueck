@@ -44,16 +44,28 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # For serving static files
+    
+    # Static files için WhiteNoise (Genellikle Listenin başında yer alır)
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
+    
+    # 1. KRİTİK: Oturum Yönetimi (Session)
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'main.middleware.NeverCacheAuthenticatedMiddleware',  # Prevent caching for authenticated users
-    'django.middleware.locale.LocaleMiddleware',  # Language selection middleware
+    
+    # Dil seçimi gibi basit işlemler (Ortalara yerleşebilir)
+    'django.middleware.locale.LocaleMiddleware', 
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    
+    # 2. KRİTİK: KİMLİK DOĞRULAMA (AUTHENTICATION) -> request.user'ı oluşturur.
+    'django.contrib.auth.middleware.AuthenticationMiddleware', 
+    
+    # Geri kalanlar
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'main.middleware.ClearSessionOnLogoutMiddleware',  # Clear session on logout
+    
+    # 3. SİZİN ÖZEL MIDDLEWARE'LERİNİZ (request.user'ı kullandıkları için MUTLAKA Authentication'dan sonra gelmeli)
+    'main.middleware.NeverCacheAuthenticatedMiddleware', 
+    'main.middleware.ClearSessionOnLogoutMiddleware', 
 ]
 
 ROOT_URLCONF = 'lesezirkel_osnabrueck.urls'
