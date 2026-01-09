@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.admin.widgets import AdminDateWidget, AdminTimeWidget, AdminSplitDateTime
-from .models import Contact, EventRegistration, Event, News
+from .models import Contact, EventRegistration, Event, News, Gallery
 from datetime import datetime
 
 
@@ -163,6 +163,49 @@ class ContactForm(forms.ModelForm):
         if value:
             raise forms.ValidationError("Spam erkannt")
         return value
+
+
+class MultipleFileInput(forms.FileInput):
+    """Custom widget that allows multiple file selection"""
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    """Custom field that handles multiple files"""
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('widget', MultipleFileInput(attrs={
+            'accept': 'image/*',
+            'class': 'vTextField',
+        }))
+        super().__init__(*args, **kwargs)
+    
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = [single_file_clean(data, initial)]
+        return result
+
+
+class GalleryBulkUploadForm(forms.Form):
+    """Form for bulk uploading multiple images to Gallery"""
+    images = MultipleFileField(
+        label='Bilder auswählen',
+        help_text='Sie können mehrere Bilder gleichzeitig auswählen (Strg/Cmd + Klick)'
+    )
+    event = forms.ModelChoiceField(
+        queryset=Event.objects.all().order_by('-date'),
+        required=False,
+        label='Veranstaltung',
+        help_text='Optional: Verknüpfen Sie die Bilder mit einer Veranstaltung'
+    )
+    title_prefix = forms.CharField(
+        max_length=100,
+        required=False,
+        label='Titel-Präfix',
+        help_text='Optional: Präfix für alle Bildtitel (z.B. "Sommerfest 2024 - ")'
+    )
 
 
 class EventRegistrationAdminForm(forms.ModelForm):

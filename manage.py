@@ -6,7 +6,19 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lesezirkel_osnabrueck.settings')
+    # Automatically detect production environment
+    # Production if: Linux server OR PRODUCTION env var is set
+    is_production = (
+        os.environ.get('PRODUCTION', '').lower() in ('true', '1', 'yes') or
+        os.path.exists('/var/www/lesezirkel-os.de')  # Production server path
+    )
+    
+    if is_production:
+        settings_module = 'lesezirkel_osnabrueck.settings_production'
+    else:
+        settings_module = 'lesezirkel_osnabrueck.settings'
+    
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_module)
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

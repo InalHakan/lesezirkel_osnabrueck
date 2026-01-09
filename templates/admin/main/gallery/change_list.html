@@ -1,0 +1,219 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+<li>
+    <a href="{% url 'admin:gallery_bulk_upload' %}" class="addlink" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 10px 15px; border-radius: 4px;">
+        📷 Mehrere Bilder hochladen
+    </a>
+</li>
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<style>
+    /* Gallery grid view option */
+    .gallery-grid-toggle {
+        margin-bottom: 15px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .gallery-grid-toggle button {
+        padding: 8px 15px;
+        border: 1px solid #ddd;
+        background: #fff;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+    
+    .gallery-grid-toggle button:hover {
+        background: #f5f5f5;
+    }
+    
+    .gallery-grid-toggle button.active {
+        background: #417690;
+        color: white;
+        border-color: #417690;
+    }
+    
+    /* Grid view styles */
+    #result_list.grid-view {
+        display: none;
+    }
+    
+    .gallery-grid {
+        display: none;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 20px 0;
+    }
+    
+    .gallery-grid.active {
+        display: grid;
+    }
+    
+    .gallery-grid-item {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .gallery-grid-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    
+    .gallery-grid-item img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+    
+    .gallery-grid-item .info {
+        padding: 10px;
+    }
+    
+    .gallery-grid-item .title {
+        font-weight: bold;
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .gallery-grid-item .actions {
+        display: flex;
+        gap: 5px;
+        padding: 10px;
+        border-top: 1px solid #eee;
+    }
+    
+    .gallery-grid-item .actions a {
+        padding: 5px 10px;
+        font-size: 12px;
+        border-radius: 4px;
+        text-decoration: none;
+    }
+    
+    .gallery-grid-item .actions .edit-btn {
+        background: #417690;
+        color: white;
+    }
+    
+    .gallery-grid-item .actions .delete-btn {
+        background: #ba2121;
+        color: white;
+    }
+    
+    .gallery-grid-item input[type="checkbox"] {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 20px;
+        height: 20px;
+        z-index: 10;
+    }
+    
+    .gallery-grid-item {
+        position: relative;
+    }
+</style>
+
+<div class="gallery-grid-toggle">
+    <span><strong>Ansicht:</strong></span>
+    <button type="button" id="list-view-btn" class="active" onclick="toggleView('list')">📋 Liste</button>
+    <button type="button" id="grid-view-btn" onclick="toggleView('grid')">🖼️ Raster</button>
+</div>
+
+{{ block.super }}
+
+<div class="gallery-grid" id="gallery-grid">
+    <!-- Grid items will be populated by JavaScript -->
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Build grid view from table data
+    const table = document.querySelector('#result_list');
+    const gridContainer = document.getElementById('gallery-grid');
+    
+    if (table) {
+        const rows = table.querySelectorAll('tbody tr');
+        
+        rows.forEach(function(row) {
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            const imgCell = row.querySelector('td.field-image_preview img');
+            const titleLink = row.querySelector('th a');
+            const eventCell = row.querySelector('td.field-event');
+            const dateCell = row.querySelector('td.field-created_at');
+            
+            if (titleLink) {
+                const item = document.createElement('div');
+                item.className = 'gallery-grid-item';
+                
+                const imgSrc = imgCell ? imgCell.src : '';
+                const title = titleLink.textContent || 'Ohne Titel';
+                const editUrl = titleLink.href;
+                const event = eventCell ? eventCell.textContent.trim() : '-';
+                const date = dateCell ? dateCell.textContent.trim() : '';
+                const checkboxHtml = checkbox ? checkbox.outerHTML : '';
+                
+                // Get delete URL
+                const deleteUrl = editUrl.replace('/change/', '/delete/');
+                
+                item.innerHTML = `
+                    ${checkboxHtml}
+                    <img src="${imgSrc || '/static/admin/img/icon-no.svg'}" alt="${title}" 
+                         onerror="this.src='/static/admin/img/icon-no.svg'; this.style.padding='40px';">
+                    <div class="info">
+                        <div class="title" title="${title}">${title}</div>
+                        <small style="color: #666;">${event}</small><br>
+                        <small style="color: #999;">${date}</small>
+                    </div>
+                    <div class="actions">
+                        <a href="${editUrl}" class="edit-btn">✏️ Bearbeiten</a>
+                        <a href="${deleteUrl}" class="delete-btn">🗑️ Löschen</a>
+                    </div>
+                `;
+                
+                gridContainer.appendChild(item);
+            }
+        });
+    }
+});
+
+function toggleView(view) {
+    const table = document.querySelector('#result_list');
+    const grid = document.getElementById('gallery-grid');
+    const listBtn = document.getElementById('list-view-btn');
+    const gridBtn = document.getElementById('grid-view-btn');
+    
+    if (view === 'grid') {
+        if (table) table.style.display = 'none';
+        grid.classList.add('active');
+        listBtn.classList.remove('active');
+        gridBtn.classList.add('active');
+        localStorage.setItem('gallery_view', 'grid');
+    } else {
+        if (table) table.style.display = '';
+        grid.classList.remove('active');
+        listBtn.classList.add('active');
+        gridBtn.classList.remove('active');
+        localStorage.setItem('gallery_view', 'list');
+    }
+}
+
+// Restore saved view preference
+document.addEventListener('DOMContentLoaded', function() {
+    const savedView = localStorage.getItem('gallery_view');
+    if (savedView === 'grid') {
+        toggleView('grid');
+    }
+});
+</script>
+{% endblock %}

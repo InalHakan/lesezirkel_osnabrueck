@@ -1,0 +1,51 @@
+/* Gallery Admin Custom Styles */
+
+/* Image preview in list */
+.field-image_preview img {
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.field-image_preview img:hover {
+    transform: scale(1.5);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 100;
+    position: relative;
+}
+
+/* Make the preview column wider */
+#result_list th:first-child + th,
+#result_list td.field-image_preview {
+    width: 100px;
+    text-align: center;
+}
+
+/* Style the bulk upload button */
+.object-tools a[href*="bulk-upload"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.object-tools a[href*="bulk-upload"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Image preview in edit form */
+.field-image_preview_large {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.field-image_preview_large img {
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.15);
+}
+
+/* Better spacing for form */
+.form-row.field-image_preview_large {
+    margin-bottom: 20px;
+}

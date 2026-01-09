@@ -1,0 +1,380 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block title %}Bilder hochladen | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_label|capfirst }}</a>
+    &rsaquo; <a href="{% url 'admin:main_gallery_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+    &rsaquo; Mehrere Bilder hochladen
+</div>
+{% endblock %}
+
+{% block content %}
+<style>
+    .bulk-upload-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .upload-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        color: white;
+    }
+    
+    .upload-header h1 {
+        margin: 0 0 10px 0;
+        font-size: 28px;
+    }
+    
+    .upload-header p {
+        margin: 0;
+        opacity: 0.9;
+    }
+    
+    .upload-form {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #333;
+    }
+    
+    .form-group .help-text {
+        font-size: 13px;
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    .form-group input[type="text"],
+    .form-group select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.2s;
+    }
+    
+    .form-group input[type="text"]:focus,
+    .form-group select:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+    
+    /* Custom file upload area */
+    .file-upload-area {
+        border: 3px dashed #ccc;
+        border-radius: 12px;
+        padding: 40px;
+        text-align: center;
+        transition: all 0.3s;
+        cursor: pointer;
+        background: #fafafa;
+    }
+    
+    .file-upload-area:hover,
+    .file-upload-area.dragover {
+        border-color: #667eea;
+        background: #f0f4ff;
+    }
+    
+    .file-upload-area .upload-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+    
+    .file-upload-area p {
+        margin: 0;
+        color: #666;
+    }
+    
+    .file-upload-area input[type="file"] {
+        display: none;
+    }
+    
+    .file-upload-area .browse-btn {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 10px 25px;
+        background: #667eea;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .file-upload-area .browse-btn:hover {
+        background: #5a6fd6;
+    }
+    
+    /* Preview grid */
+    .preview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .preview-item {
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .preview-item img {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+    }
+    
+    .preview-item .filename {
+        padding: 5px;
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        background: #f5f5f5;
+    }
+    
+    .preview-item .remove-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 24px;
+        height: 24px;
+        background: rgba(255,0,0,0.8);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 24px;
+        text-align: center;
+    }
+    
+    .preview-item .remove-btn:hover {
+        background: red;
+    }
+    
+    /* Submit button */
+    .submit-section {
+        margin-top: 30px;
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+    }
+    
+    .submit-btn {
+        padding: 15px 40px;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .submit-btn.primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .submit-btn.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .submit-btn.secondary {
+        background: #f5f5f5;
+        color: #333;
+    }
+    
+    .submit-btn.secondary:hover {
+        background: #e5e5e5;
+    }
+    
+    .file-count {
+        background: #667eea;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 15px;
+    }
+</style>
+
+<div class="bulk-upload-container">
+    <div class="upload-header">
+        <h1>📷 Mehrere Bilder hochladen</h1>
+        <p>Laden Sie mehrere Bilder gleichzeitig in die Galerie hoch</p>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data" class="upload-form" id="bulk-upload-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>{{ form.images.label }}</label>
+            <div class="file-upload-area" id="drop-area">
+                <div class="upload-icon">📁</div>
+                <p><strong>Ziehen Sie Bilder hierher</strong></p>
+                <p>oder</p>
+                <label class="browse-btn">
+                    Dateien auswählen
+                    <input type="file" name="images" id="file-input" multiple accept="image/*">
+                </label>
+                <p class="help-text" style="margin-top: 15px;">{{ form.images.help_text }}</p>
+            </div>
+            <div id="file-count" class="file-count" style="display: none;">
+                0 Dateien ausgewählt
+            </div>
+            <div class="preview-grid" id="preview-grid"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_event">{{ form.event.label }}</label>
+            {{ form.event }}
+            <p class="help-text">{{ form.event.help_text }}</p>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_title_prefix">{{ form.title_prefix.label }}</label>
+            {{ form.title_prefix }}
+            <p class="help-text">{{ form.title_prefix.help_text }}</p>
+        </div>
+        
+        <div class="submit-section">
+            <a href="{% url 'admin:main_gallery_changelist' %}" class="submit-btn secondary">Abbrechen</a>
+            <button type="submit" class="submit-btn primary" id="submit-btn" disabled>
+                📤 Hochladen
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropArea = document.getElementById('drop-area');
+    const fileInput = document.getElementById('file-input');
+    const previewGrid = document.getElementById('preview-grid');
+    const fileCount = document.getElementById('file-count');
+    const submitBtn = document.getElementById('submit-btn');
+    
+    let selectedFiles = new DataTransfer();
+    
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    // Highlight drop area when dragging over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover'), false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => dropArea.classList.remove('dragover'), false);
+    });
+    
+    // Handle dropped files
+    dropArea.addEventListener('drop', function(e) {
+        const files = e.dataTransfer.files;
+        handleFiles(files);
+    });
+    
+    // Handle selected files
+    fileInput.addEventListener('change', function() {
+        handleFiles(this.files);
+    });
+    
+    function handleFiles(files) {
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (file.type.startsWith('image/')) {
+                selectedFiles.items.add(file);
+                addPreview(file, selectedFiles.items.length - 1);
+            }
+        }
+        updateFileInput();
+        updateUI();
+    }
+    
+    function addPreview(file, index) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'preview-item';
+            div.dataset.index = index;
+            div.innerHTML = `
+                <img src="${e.target.result}" alt="${file.name}">
+                <div class="filename" title="${file.name}">${file.name}</div>
+                <button type="button" class="remove-btn" onclick="removeFile(${index})">×</button>
+            `;
+            previewGrid.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    window.removeFile = function(index) {
+        // Rebuild DataTransfer without the removed file
+        const newDataTransfer = new DataTransfer();
+        for (let i = 0; i < selectedFiles.files.length; i++) {
+            if (i !== index) {
+                newDataTransfer.items.add(selectedFiles.files[i]);
+            }
+        }
+        selectedFiles = newDataTransfer;
+        
+        // Rebuild preview grid
+        previewGrid.innerHTML = '';
+        for (let i = 0; i < selectedFiles.files.length; i++) {
+            addPreview(selectedFiles.files[i], i);
+        }
+        
+        updateFileInput();
+        updateUI();
+    };
+    
+    function updateFileInput() {
+        fileInput.files = selectedFiles.files;
+    }
+    
+    function updateUI() {
+        const count = selectedFiles.files.length;
+        if (count > 0) {
+            fileCount.style.display = 'inline-block';
+            fileCount.textContent = `${count} Datei${count === 1 ? '' : 'en'} ausgewählt`;
+            submitBtn.disabled = false;
+        } else {
+            fileCount.style.display = 'none';
+            submitBtn.disabled = true;
+        }
+    }
+});
+</script>
+{% endblock %}

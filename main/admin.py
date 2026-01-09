@@ -16,7 +16,7 @@ except ImportError:
     REPORTLAB_AVAILABLE = False
 
 from .models import Event, News, TeamMember, Gallery, Contact, EventRegistration, Document, Certificate, InvitationCode, Announcement
-from .forms import EventRegistrationAdminForm, EventAdminForm, NewsAdminForm
+from .forms import EventRegistrationAdminForm, EventAdminForm, NewsAdminForm, GalleryBulkUploadForm
 
 # Base admin mixin for file upload help text
 class FileUploadHelpMixin:
@@ -134,14 +134,105 @@ class TeamMemberAdmin(FileUploadHelpMixin, admin.ModelAdmin):
 
 @admin.register(Gallery)
 class GalleryAdmin(FileUploadHelpMixin, admin.ModelAdmin):
-    list_display = ['title', 'event', 'created_at']
+    list_display = ['image_preview', 'title', 'event', 'created_at']
+    list_display_links = ['image_preview', 'title']
     list_filter = ['event', 'created_at']
     search_fields = ['title', 'description']
     date_hierarchy = 'created_at'
     ordering = ['-created_at']
+    readonly_fields = ['image_preview_large']
+    change_list_template = 'admin/main/gallery/change_list.html'
     
     class Media:
         js = ('admin/js/file_size_validator.js',)
+        css = {
+            'all': ('admin/css/gallery_admin.css',)
+        }
+    
+    def image_preview(self, obj):
+        """Show thumbnail preview in list view"""
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);" />',
+                obj.image.url
+            )
+        return format_html('<span style="color: #999;">Kein Bild</span>')
+    image_preview.short_description = 'Vorschau'
+    image_preview.allow_tags = True
+    
+    def image_preview_large(self, obj):
+        """Show larger preview in edit view"""
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-width: 400px; max-height: 300px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);" />',
+                obj.image.url
+            )
+        return format_html('<span style="color: #999;">Kein Bild vorhanden</span>')
+    image_preview_large.short_description = 'Bildvorschau'
+    
+    fieldsets = (
+        ('Bildvorschau', {
+            'fields': ('image_preview_large',),
+            'classes': ('wide',),
+        }),
+        ('Bildinformationen', {
+            'fields': ('title', 'description', 'image', 'event'),
+        }),
+    )
+    
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        custom_urls = [
+            path('bulk-upload/', self.admin_site.admin_view(self.bulk_upload_view), name='gallery_bulk_upload'),
+        ]
+        return custom_urls + urls
+    
+    def bulk_upload_view(self, request):
+        """Handle bulk image upload"""
+        from django.shortcuts import render, redirect
+        from django.contrib import messages
+        import os
+        
+        if request.method == 'POST':
+            form = GalleryBulkUploadForm(request.POST, request.FILES)
+            if form.is_valid():
+                files = request.FILES.getlist('images')
+                event = form.cleaned_data.get('event')
+                title_prefix = form.cleaned_data.get('title_prefix', '')
+                
+                success_count = 0
+                for uploaded_file in files:
+                    # Generate title from filename if no prefix
+                    filename = os.path.splitext(uploaded_file.name)[0]
+                    if title_prefix:
+                        title = f"{title_prefix}{filename}"
+                    else:
+                        # Clean up filename for title
+                        title = filename.replace('_', ' ').replace('-', ' ').title()
+                    
+                    Gallery.objects.create(
+                        title=title,
+                        image=uploaded_file,
+                        event=event,
+                    )
+                    success_count += 1
+                
+                messages.success(
+                    request,
+                    f'✅ {success_count} Bild(er) erfolgreich hochgeladen!'
+                )
+                return redirect('admin:main_gallery_changelist')
+        else:
+            form = GalleryBulkUploadForm()
+        
+        context = {
+            **self.admin_site.each_context(request),
+            'form': form,
+            'title': 'Bilder hochladen (Mehrfachauswahl)',
+            'opts': self.model._meta,
+        }
+        return render(request, 'admin/main/gallery/bulk_upload.html', context)
 
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
