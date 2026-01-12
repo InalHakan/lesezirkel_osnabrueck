@@ -53,12 +53,12 @@ def home(request):
     ).first()
     
     # Build hero gallery images with priority:
-    # 1. Event images (upcoming events with images)
-    # 2. Gallery images
-    # 3. News images
+    # 1. Event images (upcoming events with images) - future events first
+    # 2. News images (Nachricht)
+    # Total: 6 photos
     hero_gallery = []
     
-    # 1. Add upcoming event images first (with image)
+    # 1. Add upcoming event images first (future events with images)
     events_with_images = Event.objects.filter(
         date__gte=timezone.now(),
         image__isnull=False
@@ -71,17 +71,7 @@ def home(request):
             'type': 'event'
         })
     
-    # 2. Add gallery images if we need more
-    if len(hero_gallery) < 6:
-        gallery_items = Gallery.objects.all()[:6 - len(hero_gallery)]
-        for item in gallery_items:
-            hero_gallery.append({
-                'image': item.image,
-                'title': item.title,
-                'type': 'gallery'
-            })
-    
-    # 3. Add news images if we still need more
+    # 2. Add news images if we need more (to reach 6 total)
     if len(hero_gallery) < 6:
         news_with_images = News.objects.filter(
             image__isnull=False
