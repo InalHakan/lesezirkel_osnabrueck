@@ -57,6 +57,7 @@ def home(request):
     # 2. News images (Nachricht)
     # Total: 6 photos
     hero_gallery = []
+    used_image_paths = set()  # Track used images to prevent duplicates
     
     # 1. Add upcoming event images first (future events with images)
     events_with_images = Event.objects.filter(
@@ -65,11 +66,14 @@ def home(request):
     ).exclude(image='').order_by('date')[:6]
     
     for event in events_with_images:
-        hero_gallery.append({
-            'image': event.image,
-            'title': event.title,
-            'type': 'event'
-        })
+        image_path = event.image.name if event.image else None
+        if image_path and image_path not in used_image_paths:
+            hero_gallery.append({
+                'image': event.image,
+                'title': event.title,
+                'type': 'event'
+            })
+            used_image_paths.add(image_path)
     
     # 2. Add news images if we need more (to reach 6 total)
     if len(hero_gallery) < 6:
@@ -78,11 +82,14 @@ def home(request):
         ).exclude(image='').order_by('-published_date')[:6 - len(hero_gallery)]
         
         for news in news_with_images:
-            hero_gallery.append({
-                'image': news.image,
-                'title': news.title,
-                'type': 'news'
-            })
+            image_path = news.image.name if news.image else None
+            if image_path and image_path not in used_image_paths:
+                hero_gallery.append({
+                    'image': news.image,
+                    'title': news.title,
+                    'type': 'news'
+                })
+                used_image_paths.add(image_path)
     
     # Keep recent_gallery for backward compatibility (lower section)
     recent_gallery = Gallery.objects.all()[:6]
@@ -103,6 +110,10 @@ def about(request):
         'team_members': team_members,
     }
     return render(request, 'main/about.html', context)
+
+def platforms(request):
+    """Platforms page view"""
+    return render(request, 'main/platforms.html')
 
 def events(request):
     """Events page view - Calendar format"""

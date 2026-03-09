@@ -221,8 +221,8 @@ JAZZMIN_SETTINGS = {
     "site_brand": "Lesezirkel",
     
     # Logo to use for your site (path relative to STATIC_URL)
-    "site_logo": "images/logo.png",
-    "login_logo": "images/logo.png",
+    "site_logo": "images/logo.jpeg",
+    "login_logo": "images/logo.jpeg",
     
     # Logo to use for login form in dark themes
     "login_logo_dark": None,

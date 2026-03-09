@@ -336,25 +336,44 @@ body {
     mask: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0) 100%);
 }
 
-/* Smooth carousel transitions */
-#heroGalleryCarousel .carousel-item {
-    transition: opacity 1.5s ease-in-out, transform 1.5s ease-in-out;
+/* Smooth carousel crossfade transitions */
+#heroGalleryCarousel .carousel-inner {
+    position: relative;
 }
 
-#heroGalleryCarousel .carousel-item.active,
+#heroGalleryCarousel .carousel-item {
+    transition: opacity 1.5s ease-in-out;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    display: block !important;
+    z-index: 0;
+}
+
+#heroGalleryCarousel .carousel-item.active {
+    position: relative;
+    opacity: 1;
+    z-index: 1;
+}
+
 #heroGalleryCarousel .carousel-item-next,
 #heroGalleryCarousel .carousel-item-prev {
-    display: block;
-}
-
-#heroGalleryCarousel .carousel-item-next:not(.carousel-item-start),
-#heroGalleryCarousel .carousel-item-prev:not(.carousel-item-end) {
-    opacity: 0;
+    position: absolute;
+    z-index: 0;
 }
 
 #heroGalleryCarousel .carousel-item-next.carousel-item-start,
 #heroGalleryCarousel .carousel-item-prev.carousel-item-end {
     opacity: 1;
+    z-index: 1;
+}
+
+#heroGalleryCarousel .active.carousel-item-start,
+#heroGalleryCarousel .active.carousel-item-end {
+    opacity: 0;
+    z-index: 0;
 }
 
 #heroGalleryCarousel .carousel-inner {

@@ -15,7 +15,7 @@
     {% endif %}
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+    <link rel="icon" type="image/jpeg" href="{% static 'images/logo.jpeg' %}">
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -33,11 +33,11 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
             <a class="navbar-brand fw-bold text-primary d-flex align-items-center" href="{% url 'home' %}">
-                <img src="{% static_with_version 'images/logo.png' %}" alt="Lesezirkel Logo" style="height: 65px; width: auto;" class="me-2">
-                <div class="d-flex flex-column lh-sm">
+                <img src="{% static_with_version 'images/logo.jpeg' %}" alt="Lesezirkel Logo" style="height: 160px; width: auto;" class="me-2">
+                {% comment %} <div class="d-flex flex-column lh-sm">
                     <span class="brand-main" style="font-size: 2rem; font-weight: 700;">Lesezirkel</span>
                     <span class="brand-subtitle" style="font-size: 0.85rem; font-weight: 500; opacity: 0.85;">der Friedensstatt Osnabrück e. V.</span>
-                </div>
+                </div> {% endcomment %}
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -49,6 +49,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'about' %}">Über uns</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'platforms' %}">Plattformen</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'events' %}">Veranstaltungen</a>
@@ -64,11 +67,6 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'contact' %}">Kontakt</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-danger fw-semibold d-flex align-items-center" href="{% url 'donate' %}">
-                            <i class="fas fa-heart me-2"></i><span>Spenden</span>
-                        </a>
                     </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
@@ -125,7 +123,7 @@
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4">
                     <h5 class="mb-3 d-flex align-items-center text-white">
-                        <img src="{% static 'images/logo.png' %}" alt="Lesezirkel Logo" style="height: 32px; width: auto;" class="me-2">
+                        <img src="{% static 'images/logo.jpeg' %}" alt="Lesezirkel Logo" style="height: 32px; width: auto;" class="me-2">
                         Lesezirkel der Friedensstatt Osnabrück e.V.
                     </h5>
                     <p class="text-light opacity-75">

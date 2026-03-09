@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Script to help save the logo image to the static directory.
-Run this script and then manually copy your logo image to static/images/logo.png
+Run this script and then manually copy your logo image to static/images/logo.jpeg
 """
 
 import os
@@ -14,7 +14,7 @@ def save_logo():
     os.makedirs(static_images_dir, exist_ok=True)
     
     print(f"Static images directory is ready: {static_images_dir}")
-    print("Please manually copy your logo file to: static/images/logo.png")
+    print("Please manually copy your logo file to: static/images/logo.jpeg")
     print("The template has been updated to use the new logo!")
     
     # List current files in the directory
