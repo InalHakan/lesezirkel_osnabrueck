@@ -1,0 +1,265 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<style>
+    .email-container {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .email-header {
+        background: #417690;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px 8px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .email-header h2 {
+        margin: 0;
+        font-size: 18px;
+    }
+    .folder-list {
+        width: 200px;
+        background: #f8f9fa;
+        border-right: 1px solid #ddd;
+        padding: 10px 0;
+        float: left;
+        min-height: 500px;
+    }
+    .folder-list a {
+        display: block;
+        padding: 8px 15px;
+        color: #333;
+        text-decoration: none;
+        border-left: 3px solid transparent;
+    }
+    .folder-list a:hover {
+        background: #e9ecef;
+    }
+    .folder-list a.active {
+        background: #e3f2fd;
+        border-left-color: #417690;
+        font-weight: bold;
+    }
+    .email-list {
+        margin-left: 200px;
+        padding: 0;
+    }
+    .email-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .email-item:hover {
+        background: #f5f5f5;
+    }
+    .email-item.unread {
+        background: #e8f4fd;
+        font-weight: bold;
+    }
+    .email-item .sender {
+        width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #333;
+    }
+    .email-item .subject {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #555;
+    }
+    .email-item .snippet {
+        color: #999;
+        margin-left: 10px;
+        flex: 2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .email-item .date {
+        width: 120px;
+        text-align: right;
+        color: #888;
+        font-size: 12px;
+    }
+    .email-item a {
+        color: inherit;
+        text-decoration: none;
+        display: flex;
+        width: 100%;
+    }
+    .toolbar {
+        padding: 10px 15px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #ddd;
+    }
+    .toolbar a {
+        display: inline-block;
+        padding: 8px 15px;
+        background: #417690;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+    .toolbar a:hover {
+        background: #205067;
+    }
+    .error-box {
+        background: #ffebee;
+        color: #c62828;
+        padding: 15px;
+        margin: 15px;
+        border-radius: 4px;
+    }
+    .empty-inbox {
+        text-align: center;
+        padding: 50px;
+        color: #999;
+    }
+    .empty-inbox i {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+    .clearfix::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+    .email-checkbox {
+        display: flex;
+        align-items: center;
+        padding: 0 10px 0 5px;
+    }
+    .email-checkbox input {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+    .email-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .email-item a {
+        color: inherit;
+        text-decoration: none;
+        display: flex;
+        flex: 1;
+        align-items: center;
+    }
+    .delete-single {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px 10px;
+        opacity: 0.5;
+        font-size: 16px;
+    }
+    .delete-single:hover {
+        opacity: 1;
+    }
+    .delete-btn:hover {
+        background: #b71c1c !important;
+    }
+</style>
+
+<div class="email-container">
+    <div class="email-header">
+        <h2>📧 {{ account.email }}</h2>
+        <a href="{% url 'admin:email_manager_emailaccount_changelist' %}" style="color: white;">← Zurück zur Liste</a>
+    </div>
+    
+    <div class="toolbar">
+        <a href="{% url 'admin:email_manager_emailaccount_compose' account.pk %}">✉️ Neue E-Mail</a>
+        <a href="{% url 'admin:email_manager_emailaccount_inbox' account.pk %}">🔄 Aktualisieren</a>
+        <button type="button" onclick="deleteSelected()" class="delete-btn" style="background: #d32f2f; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">🗑️ Ausgewählte löschen</button>
+        <label style="margin-left: 15px; font-size: 13px;">
+            <input type="checkbox" id="selectAll" onchange="toggleSelectAll()"> Alle auswählen
+        </label>
+    </div>
+    
+    {% if error %}
+    <div class="error-box">
+        <strong>Fehler:</strong> {{ error }}
+    </div>
+    {% endif %}
+    
+    <div class="clearfix">
+        <div class="folder-list">
+            {% for folder in folders %}
+            <a href="{% url 'admin:email_manager_emailaccount_inbox_folder' account.pk folder %}" 
+               class="{% if folder == current_folder %}active{% endif %}">
+                {% if folder == "INBOX" %}📥{% elif "Sent" in folder %}📤{% elif "Trash" in folder %}🗑️{% elif "Draft" in folder %}📝{% else %}📁{% endif %}
+                {{ folder }}
+            </a>
+            {% empty %}
+            <a href="#" class="active">📥 INBOX</a>
+            {% endfor %}
+        </div>
+        
+        <div class="email-list">
+            <form id="deleteForm" method="post" action="{% url 'admin:email_manager_emailaccount_delete_multiple' account.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="folder" value="{{ current_folder }}">
+                
+            {% for email in emails %}
+            <div class="email-item {% if not email.is_read %}unread{% endif %}">
+                <label class="email-checkbox" onclick="event.stopPropagation();">
+                    <input type="checkbox" name="uids" value="{{ email.uid }}" class="email-select">
+                </label>
+                <a href="{% url 'admin:email_manager_emailaccount_read' account.pk email.uid %}?folder={{ current_folder }}">
+                    <span class="sender" title="{{ email.from }}">{{ email.from|truncatechars:25 }}</span>
+                    <span class="subject">{{ email.subject|default:"(Kein Betreff)" }}</span>
+                    <span class="snippet">{{ email.snippet }}</span>
+                    <span class="date">{{ email.date|date:"d.m.Y H:i" }}</span>
+                </a>
+                <button type="button" class="delete-single" onclick="deleteSingle('{{ email.uid }}')" title="Löschen">🗑️</button>
+            </div>
+            {% empty %}
+            <div class="empty-inbox">
+                <div style="font-size: 48px;">📭</div>
+                <p>Keine E-Mails in diesem Ordner</p>
+            </div>
+            {% endfor %}
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleSelectAll() {
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.email-select');
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+}
+
+function deleteSelected() {
+    const checkboxes = document.querySelectorAll('.email-select:checked');
+    if (checkboxes.length === 0) {
+        alert('Bitte wählen Sie mindestens eine E-Mail aus.');
+        return;
+    }
+    if (confirm('Möchten Sie ' + checkboxes.length + ' E-Mail(s) wirklich löschen?')) {
+        document.getElementById('deleteForm').submit();
+    }
+}
+
+function deleteSingle(uid) {
+    if (confirm('Möchten Sie diese E-Mail wirklich löschen?')) {
+        window.location.href = '{% url "admin:email_manager_emailaccount_delete" account.pk "PLACEHOLDER" %}'.replace('PLACEHOLDER', uid) + '?folder={{ current_folder }}';
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,165 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<style>
+    .compose-container {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .compose-header {
+        background: #417690;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px 8px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .compose-header h2 {
+        margin: 0;
+        font-size: 18px;
+    }
+    .compose-form {
+        padding: 20px;
+    }
+    .form-row {
+        margin-bottom: 15px;
+    }
+    .form-row label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+    }
+    .form-row input[type="text"],
+    .form-row input[type="email"],
+    .form-row textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+    .form-row input:focus,
+    .form-row textarea:focus {
+        border-color: #417690;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(65, 118, 144, 0.2);
+    }
+    .form-row textarea {
+        min-height: 300px;
+        font-family: inherit;
+        line-height: 1.5;
+    }
+    .form-actions {
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-top: 1px solid #ddd;
+        border-radius: 0 0 8px 8px;
+        text-align: right;
+    }
+    .form-actions button {
+        padding: 10px 25px;
+        background: #417690;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-left: 10px;
+    }
+    .form-actions button:hover {
+        background: #205067;
+    }
+    .form-actions a {
+        padding: 10px 20px;
+        color: #666;
+        text-decoration: none;
+    }
+    .sender-info {
+        background: #e3f2fd;
+        padding: 10px 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+    .sender-info strong {
+        color: #417690;
+    }
+    .help-text {
+        font-size: 12px;
+        color: #888;
+        margin-top: 5px;
+    }
+    .errorlist {
+        color: #c62828;
+        background: #ffebee;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        list-style: none;
+    }
+</style>
+
+<div class="compose-container">
+    <div class="compose-header">
+        <h2>✉️ Neue E-Mail verfassen</h2>
+        <a href="{% url 'admin:email_manager_emailaccount_inbox' account.pk %}" style="color: white;">← Zurück</a>
+    </div>
+    
+    <form method="post" class="compose-form">
+        {% csrf_token %}
+        
+        <div class="sender-info">
+            <strong>Von:</strong> {{ account.display_name }} &lt;{{ account.email }}&gt;
+        </div>
+        
+        {% if form.errors %}
+        <ul class="errorlist">
+            {% for field in form %}
+                {% for error in field.errors %}
+                <li>{{ field.label }}: {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+        {% endif %}
+        
+        <div class="form-row">
+            <label for="id_to_address">An:</label>
+            <input type="email" name="to_address" id="id_to_address" 
+                   value="{{ form.to_address.value|default:'' }}" 
+                   placeholder="empfaenger@example.com" required>
+        </div>
+        
+        <div class="form-row">
+            <label for="id_cc_address">CC:</label>
+            <input type="text" name="cc_address" id="id_cc_address" 
+                   value="{{ form.cc_address.value|default:'' }}"
+                   placeholder="cc1@example.com, cc2@example.com">
+            <p class="help-text">Mehrere Adressen mit Komma trennen</p>
+        </div>
+        
+        <div class="form-row">
+            <label for="id_subject">Betreff:</label>
+            <input type="text" name="subject" id="id_subject" 
+                   value="{{ form.subject.value|default:'' }}"
+                   placeholder="Betreff eingeben" required>
+        </div>
+        
+        <div class="form-row">
+            <label for="id_body">Nachricht:</label>
+            <textarea name="body" id="id_body" placeholder="Ihre Nachricht..." required>{{ form.body.value|default:'' }}</textarea>
+        </div>
+        
+        <div class="form-actions">
+            <a href="{% url 'admin:email_manager_emailaccount_inbox' account.pk %}">Abbrechen</a>
+            <button type="submit">📤 E-Mail senden</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

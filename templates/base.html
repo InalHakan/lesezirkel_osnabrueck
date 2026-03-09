@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Lesezirkel der Friedensstatt Osnabrück e.V.{% endblock %}</title>
+    <title>{% block title %}Lesezirkel der Friedensstadt Osnabrück e.V.{% endblock %}</title>
     
     <!-- Prevent caching for authenticated users -->
     {% if user.is_authenticated %}
@@ -36,7 +36,7 @@
                 <img src="{% static_with_version 'images/logo.jpeg' %}" alt="Lesezirkel Logo" style="height: 160px; width: auto;" class="me-2">
                 {% comment %} <div class="d-flex flex-column lh-sm">
                     <span class="brand-main" style="font-size: 2rem; font-weight: 700;">Lesezirkel</span>
-                    <span class="brand-subtitle" style="font-size: 0.85rem; font-weight: 500; opacity: 0.85;">der Friedensstatt Osnabrück e. V.</span>
+                    <span class="brand-subtitle" style="font-size: 0.85rem; font-weight: 500; opacity: 0.85;">der Friedensstadt Osnabrück e. V.</span>
                 </div> {% endcomment %}
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -124,7 +124,7 @@
                 <div class="col-lg-4 col-md-6 mb-4">
                     <h5 class="mb-3 d-flex align-items-center text-white">
                         <img src="{% static 'images/logo.jpeg' %}" alt="Lesezirkel Logo" style="height: 32px; width: auto;" class="me-2">
-                        Lesezirkel der Friedensstatt Osnabrück e.V.
+                        Lesezirkel der Friedensstadt Osnabrück e.V.
                     </h5>
                     <p class="text-light opacity-75">
                         Wir setzen uns für eine offene, demokratische und vielfältige Gesellschaft ein. 

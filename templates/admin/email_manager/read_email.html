@@ -1,0 +1,197 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<style>
+    .email-view-container {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .email-view-header {
+        background: #417690;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px 8px 0 0;
+    }
+    .email-view-header h2 {
+        margin: 0 0 5px 0;
+        font-size: 18px;
+    }
+    .email-toolbar {
+        padding: 10px 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #ddd;
+    }
+    .email-toolbar a {
+        display: inline-block;
+        padding: 8px 15px;
+        background: #417690;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-right: 10px;
+        font-size: 13px;
+    }
+    .email-toolbar a:hover {
+        background: #205067;
+    }
+    .email-toolbar a.secondary {
+        background: #6c757d;
+    }
+    .email-meta {
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+    }
+    .email-meta-row {
+        display: flex;
+        margin-bottom: 8px;
+    }
+    .email-meta-label {
+        width: 80px;
+        font-weight: bold;
+        color: #666;
+    }
+    .email-meta-value {
+        flex: 1;
+        color: #333;
+    }
+    .email-subject {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #eee;
+    }
+    .email-body {
+        padding: 20px;
+        min-height: 300px;
+        line-height: 1.6;
+        color: #333;
+    }
+    .email-body pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: inherit;
+        margin: 0;
+    }
+    .email-body-html {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 4px;
+        background: #fafafa;
+    }
+    .error-box {
+        background: #ffebee;
+        color: #c62828;
+        padding: 15px;
+        margin: 15px;
+        border-radius: 4px;
+    }
+    .tab-buttons {
+        padding: 10px 20px;
+        background: #f0f0f0;
+        border-bottom: 1px solid #ddd;
+    }
+    .tab-buttons button {
+        padding: 8px 15px;
+        border: none;
+        background: #ddd;
+        cursor: pointer;
+        border-radius: 4px 4px 0 0;
+        margin-right: 5px;
+    }
+    .tab-buttons button.active {
+        background: #fff;
+        border-bottom: 2px solid #417690;
+    }
+</style>
+
+<div class="email-view-container">
+    <div class="email-view-header">
+        <h2>📧 {{ account.email }}</h2>
+    </div>
+    
+    <div class="email-toolbar">
+        <a href="{% url 'admin:email_manager_emailaccount_inbox_folder' account.pk folder %}">← Zurück zum Posteingang</a>
+        {% if email %}
+        <a href="{% url 'admin:email_manager_emailaccount_compose' account.pk %}?reply_to={{ email.from|urlencode }}&subject={{ email.subject|urlencode }}">↩️ Antworten</a>
+        <a href="{% url 'admin:email_manager_emailaccount_delete' account.pk email.uid %}?folder={{ folder }}" 
+           class="secondary" style="background: #d32f2f;"
+           onclick="return confirm('Möchten Sie diese E-Mail wirklich löschen?');">🗑️ Löschen</a>
+        {% endif %}
+        <a href="{% url 'admin:email_manager_emailaccount_compose' account.pk %}" class="secondary">✉️ Neue E-Mail</a>
+    </div>
+    
+    {% if error %}
+    <div class="error-box">
+        <strong>Fehler:</strong> {{ error }}
+    </div>
+    {% endif %}
+    
+    {% if email %}
+    <div class="email-subject">
+        {{ email.subject|default:"(Kein Betreff)" }}
+    </div>
+    
+    <div class="email-meta">
+        <div class="email-meta-row">
+            <span class="email-meta-label">Von:</span>
+            <span class="email-meta-value">{{ email.from }}</span>
+        </div>
+        <div class="email-meta-row">
+            <span class="email-meta-label">An:</span>
+            <span class="email-meta-value">{{ email.to }}</span>
+        </div>
+        {% if email.cc %}
+        <div class="email-meta-row">
+            <span class="email-meta-label">CC:</span>
+            <span class="email-meta-value">{{ email.cc }}</span>
+        </div>
+        {% endif %}
+        <div class="email-meta-row">
+            <span class="email-meta-label">Datum:</span>
+            <span class="email-meta-value">{{ email.date|date:"d. F Y, H:i" }} Uhr</span>
+        </div>
+    </div>
+    
+    <div class="email-body">
+        {% if email.html_body %}
+        <div class="tab-buttons">
+            <button onclick="showText()" id="btn-text">Text</button>
+            <button onclick="showHtml()" id="btn-html" class="active">HTML</button>
+        </div>
+        <div id="text-content" style="display: none;">
+            <pre>{{ email.text_body }}</pre>
+        </div>
+        <div id="html-content" class="email-body-html">
+            {{ email.html_body|safe }}
+        </div>
+        <script>
+            function showText() {
+                document.getElementById('text-content').style.display = 'block';
+                document.getElementById('html-content').style.display = 'none';
+                document.getElementById('btn-text').classList.add('active');
+                document.getElementById('btn-html').classList.remove('active');
+            }
+            function showHtml() {
+                document.getElementById('text-content').style.display = 'none';
+                document.getElementById('html-content').style.display = 'block';
+                document.getElementById('btn-text').classList.remove('active');
+                document.getElementById('btn-html').classList.add('active');
+            }
+        </script>
+        {% else %}
+        <pre>{{ email.text_body }}</pre>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="error-box">
+        E-Mail konnte nicht geladen werden.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

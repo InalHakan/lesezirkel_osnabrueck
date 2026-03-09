@@ -38,15 +38,17 @@
                         <div class="carousel-inner">
                             {% for item in hero_gallery %}
                             <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                <div class="gallery-reflection-container">
-                                    <img src="{{ item.image.url }}" alt="{{ item.title }}" class="hero-gallery-img">
-                                    <div class="gallery-reflection-effect">
-                                        <img src="{{ item.image.url }}" alt="{{ item.title }} Reflection" class="hero-gallery-img-reflection">
+                                <a href="{% if item.type == 'event' %}{% url 'event_detail' item.id %}{% else %}{% url 'news_detail' item.id %}{% endif %}" class="text-decoration-none">
+                                    <div class="gallery-reflection-container">
+                                        <img src="{{ item.image.url }}" alt="{{ item.title }}" class="hero-gallery-img" style="cursor: pointer;">
+                                        <div class="gallery-reflection-effect">
+                                            <img src="{{ item.image.url }}" alt="{{ item.title }} Reflection" class="hero-gallery-img-reflection">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="carousel-caption-handwriting">
-                                    <p class="handwriting-text" data-text="{{ item.title }}">{{ item.title }}</p>
-                                </div>
+                                    <div class="carousel-caption-handwriting">
+                                        <p class="handwriting-text" data-text="{{ item.title }}">{{ item.title }}</p>
+                                    </div>
+                                </a>
                             </div>
                             {% endfor %}
                         </div>

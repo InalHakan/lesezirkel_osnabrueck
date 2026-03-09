@@ -485,7 +485,7 @@ class EventRegistrationAdmin(admin.ModelAdmin):
         html_content += f"""
             <div class="print-info">
                 <p><em>Teilnehmerliste erstellt am {datetime.now().strftime('%d.%m.%Y um %H:%M')} | 
-                Lesezirkel der Friedensstatt Osnabrück e.V.</em></p>
+                Lesezirkel der Friedensstadt Osnabrück e.V.</em></p>
             </div>
         </body>
         </html>

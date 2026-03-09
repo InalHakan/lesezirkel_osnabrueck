@@ -71,7 +71,8 @@ def home(request):
             hero_gallery.append({
                 'image': event.image,
                 'title': event.title,
-                'type': 'event'
+                'type': 'event',
+                'id': event.pk
             })
             used_image_paths.add(image_path)
     
@@ -87,7 +88,8 @@ def home(request):
                 hero_gallery.append({
                     'image': news.image,
                     'title': news.title,
-                    'type': 'news'
+                    'type': 'news',
+                    'id': news.pk
                 })
                 used_image_paths.add(image_path)
     

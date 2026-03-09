@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Spenden - Lesezirkel der Friedensstatt Osnabrück e.V.{% endblock %}
+{% block title %}Spenden - Lesezirkel der Friedensstadt Osnabrück e.V.{% endblock %}
 
 {% block content %}
 <!-- Donate Section -->
@@ -12,56 +12,114 @@
                 <div class="text-center mb-5">
                     <h1 class="display-4 mb-3">
                         <i class="fas fa-heart text-danger me-3"></i>
-                        Unterstützen Sie unsere Arbeit
+                        Gemeinsam Zukunft gestalten
                     </h1>
                     <p class="lead text-muted">
-                        Ihre Spende hilft uns, kulturelle Brücken zu bauen und Menschen zusammenzubringen.
+                        Ihre Spende macht den Unterschied
                     </p>
                 </div>
 
-                <!-- Why Donate -->
+                <!-- Introduction -->
                 <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-body p-4">
-                        <h3 class="card-title mb-4">
-                            <i class="fas fa-hands-helping text-primary me-2"></i>
-                            Warum spenden?
-                        </h3>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <div class="d-flex">
-                                    <i class="fas fa-book-reader text-primary me-3 mt-1" style="font-size: 1.5rem;"></i>
-                                    <div>
-                                        <h5>Kulturelle Veranstaltungen</h5>
-                                        <p class="text-muted mb-0">Wir organisieren regelmäßig Lesungen, Diskussionen und kulturelle Events.</p>
+                    <div class="card-body p-4 text-center">
+                        <p class="lead mb-0">
+                            Mit Ihrer Unterstützung fördern Sie konkrete Projekte unseres Vereins in Osnabrück. 
+                            Gemeinsam stärken wir Bildung, gesellschaftlichen Zusammenhalt und interkulturellen Dialog – 
+                            und ermöglichen Menschen, ihr Potenzial zu entfalten.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Project Areas -->
+                <div class="row mb-4">
+                    <!-- Kinder- und Jugendförderung -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                                        <i class="fas fa-child text-primary fa-2x"></i>
                                     </div>
+                                    <h4 class="card-title mb-0">Kinder- und Jugendförderung</h4>
                                 </div>
+                                <p class="text-muted mb-3">
+                                    Wir begleiten Kinder und Jugendliche auf ihrem Weg zu selbstbewussten, starken Persönlichkeiten.
+                                </p>
+                                <p class="fw-semibold mb-2">Ihre Spende unterstützt:</p>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Bildungsangebote und Workshops</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Soziale Projekte und Mentoring</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Persönliche Entwicklung junger Menschen</li>
+                                </ul>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="d-flex">
-                                    <i class="fas fa-users text-primary me-3 mt-1" style="font-size: 1.5rem;"></i>
-                                    <div>
-                                        <h5>Gemeinschaft fördern</h5>
-                                        <p class="text-muted mb-0">Wir bringen Menschen unterschiedlicher Kulturen zusammen.</p>
+                        </div>
+                    </div>
+
+                    <!-- Frauen stärken -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-danger bg-opacity-10 p-3 me-3">
+                                        <i class="fas fa-venus text-danger fa-2x"></i>
                                     </div>
+                                    <h4 class="card-title mb-0">Frauen stärken – Gesellschaft gestalten</h4>
                                 </div>
+                                <p class="text-muted mb-3">
+                                    Unsere Frauenplattform fördert die aktive Teilhabe von Frauen verschiedener Kulturen.
+                                </p>
+                                <p class="fw-semibold mb-2">Ihre Unterstützung ermöglicht:</p>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Austauschprogramme und Netzwerke</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Bildungs- und Weiterbildungsangebote</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Veranstaltungen zur persönlichen Entwicklung</li>
+                                </ul>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="d-flex">
-                                    <i class="fas fa-graduation-cap text-primary me-3 mt-1" style="font-size: 1.5rem;"></i>
-                                    <div>
-                                        <h5>Bildung & Integration</h5>
-                                        <p class="text-muted mb-0">Wir unterstützen Bildungsprojekte und Integrationsinitiativen.</p>
+                        </div>
+                    </div>
+
+                    <!-- Familien verbinden -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                                        <i class="fas fa-people-roof text-info fa-2x"></i>
                                     </div>
+                                    <h4 class="card-title mb-0">Familien verbinden</h4>
                                 </div>
+                                <p class="text-muted mb-3">
+                                    Unsere Familienplattform bringt Migranten- und einheimische Familien zusammen.
+                                </p>
+                                <p class="fw-semibold mb-2">Dank Ihrer Spende entstehen:</p>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Gemeinsame Aktivitäten für Kinder und Erwachsene</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Kultureller Austausch und gegenseitige Unterstützung</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Positive Entwicklung für die nächste Generation</li>
+                                </ul>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="d-flex">
-                                    <i class="fas fa-globe text-primary me-3 mt-1" style="font-size: 1.5rem;"></i>
-                                    <div>
-                                        <h5>Interkultureller Dialog</h5>
-                                        <p class="text-muted mb-0">Wir fördern den Austausch zwischen verschiedenen Kulturen.</p>
+                        </div>
+                    </div>
+
+                    <!-- Dialog -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                                        <i class="fas fa-comments text-success fa-2x"></i>
                                     </div>
+                                    <h4 class="card-title mb-0">Dialog und gesellschaftlicher Zusammenhalt</h4>
                                 </div>
+                                <p class="text-muted mb-3">
+                                    Wir bauen Brücken zwischen Menschen unterschiedlicher Kulturen, Religionen und Lebensweisen.
+                                </p>
+                                <p class="fw-semibold mb-2">Mit Ihrer Hilfe realisieren wir:</p>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Begegnungen und Diskussionsrunden</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Interkulturelle Veranstaltungen</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Projekte, die gegenseitiges Verständnis fördern</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -82,7 +140,7 @@
                                 <div class="bg-light p-3 rounded mb-3">
                                     <div class="mb-2">
                                         <small class="text-muted">Kontoinhaber:</small><br>
-                                        <strong>Lesezirkel der Friedensstatt Osnabrück e.V.</strong>
+                                        <strong>Lesezirkel der Friedensstadt Osnabrück e.V.</strong>
                                     </div>
                                     <div class="mb-2">
                                         <small class="text-muted">IBAN:</small><br>
@@ -119,12 +177,17 @@
                                 </h4>
                                 <p class="text-muted mb-4">Schnell und sicher online spenden</p>
                                 
-                                <!-- PayPal Button Placeholder -->
+                                <!-- PayPal QR Code and Button -->
                                 <div class="text-center p-4 bg-light rounded mb-3">
-                                    <p class="mb-3">Spenden Sie bequem mit PayPal:</p>
+                                    <p class="mb-3">Scannen Sie den QR-Code oder klicken Sie auf den Button:</p>
                                     
-                                    <!-- Replace with actual PayPal button code -->
-                                    <a href="https://www.paypal.com/donate" target="_blank" class="btn btn-primary btn-lg">
+                                    <!-- PayPal QR Code -->
+                                    <div class="mb-3">
+                                        <img src="{% static 'images/PayPal.jpeg' %}" alt="PayPal QR-Code" class="img-fluid rounded shadow-sm" style="max-width: 200px;">
+                                    </div>
+                                    
+                                    <!-- PayPal Button -->
+                                    <a href="https://www.paypal.com/paypalme/LesezirkelOsna" target="_blank" class="btn btn-primary btn-lg">
                                         <i class="fab fa-paypal me-2"></i>
                                         Mit PayPal spenden
                                     </a>
@@ -151,7 +214,7 @@
                             Spendenbescheinigung
                         </h4>
                         <p class="mb-3">
-                            Der Lesezirkel der Friedensstatt Osnabrück e.V. ist als gemeinnütziger Verein anerkannt. 
+                            Der Lesezirkel der Friedensstadt Osnabrück e.V. ist als gemeinnütziger Verein anerkannt. 
                             Ihre Spende ist steuerlich absetzbar.
                         </p>
                         <p class="mb-0">
@@ -185,7 +248,7 @@
 
 <script>
 function copyIBAN() {
-    const iban = "DE00 0000 0000 0000 0000 00";
+    const iban = "DE52 2655 0105 0000 2855 02";
     navigator.clipboard.writeText(iban).then(() => {
         alert("IBAN kopiert: " + iban);
     }).catch(err => {

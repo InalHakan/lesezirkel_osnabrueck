@@ -1,7 +1,81 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Galerie - Lesezirkel der Friedensstatt Osnabrück e.V.{% endblock %}
+{% block title %}Galerie - Lesezirkel der Friedensstadt Osnabrück e.V.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .gallery-img {
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .gallery-img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .lightbox-img {
+        max-height: 80vh;
+        max-width: 100%;
+        object-fit: contain;
+    }
+    .lightbox-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255,255,255,0.9);
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        color: #333;
+        transition: all 0.3s ease;
+        z-index: 1060;
+    }
+    .lightbox-nav:hover {
+        background: #fff;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .lightbox-nav.prev {
+        left: 15px;
+    }
+    .lightbox-nav.next {
+        right: 15px;
+    }
+    .lightbox-counter {
+        position: absolute;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.7);
+        color: #fff;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+    }
+    #lightboxModal .modal-content {
+        background: transparent;
+        border: none;
+    }
+    #lightboxModal .modal-body {
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+    }
+    #lightboxModal .btn-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        z-index: 1060;
+        background-color: rgba(255,255,255,0.9);
+        border-radius: 50%;
+        padding: 10px;
+        opacity: 1;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <!-- Page Header -->
@@ -24,13 +98,42 @@
                 {% for item in gallery_items %}
                 <div class="col-lg-3 col-md-4 col-6 mb-4">
                     <div class="position-relative">
-                        <img src="{{ item.image.url }}" alt="{{ item.title }}" class="gallery-img">
+                        <img src="{{ item.image.url }}" 
+                             alt="{{ item.title }}" 
+                             class="gallery-img"
+                             data-bs-toggle="modal" 
+                             data-bs-target="#lightboxModal"
+                             data-index="{{ forloop.counter0 }}"
+                             data-src="{{ item.image.url }}"
+                             data-title="{{ item.title }}">
                         <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-2">
                             <small>{{ item.title }}</small>
                         </div>
                     </div>
                 </div>
                 {% endfor %}
+            </div>
+
+            <!-- Lightbox Modal -->
+            <div class="modal fade" id="lightboxModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-fullscreen">
+                    <div class="modal-content">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+                        <button type="button" class="lightbox-nav prev" id="lightboxPrev">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button type="button" class="lightbox-nav next" id="lightboxNext">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <div class="modal-body">
+                            <img src="" alt="" class="lightbox-img" id="lightboxImage">
+                        </div>
+                        <div class="lightbox-counter">
+                            <span id="lightboxCurrent">1</span> / <span id="lightboxTotal">{{ gallery_items|length }}</span>
+                        </div>
+                        <div class="text-center text-white py-2" id="lightboxTitle"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- Pagination -->
@@ -72,4 +175,68 @@
         {% endif %}
     </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const galleryImages = document.querySelectorAll('.gallery-img');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxTitle = document.getElementById('lightboxTitle');
+    const lightboxCurrent = document.getElementById('lightboxCurrent');
+    const lightboxPrev = document.getElementById('lightboxPrev');
+    const lightboxNext = document.getElementById('lightboxNext');
+    
+    let currentIndex = 0;
+    const images = [];
+    
+    // Collect all images data
+    galleryImages.forEach((img, index) => {
+        images.push({
+            src: img.dataset.src,
+            title: img.dataset.title
+        });
+        
+        img.addEventListener('click', function() {
+            currentIndex = index;
+            updateLightbox();
+        });
+    });
+    
+    function updateLightbox() {
+        if (images.length > 0) {
+            lightboxImage.src = images[currentIndex].src;
+            lightboxImage.alt = images[currentIndex].title;
+            lightboxTitle.textContent = images[currentIndex].title;
+            lightboxCurrent.textContent = currentIndex + 1;
+        }
+    }
+    
+    // Previous button
+    lightboxPrev.addEventListener('click', function() {
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+        updateLightbox();
+    });
+    
+    // Next button
+    lightboxNext.addEventListener('click', function() {
+        currentIndex = (currentIndex + 1) % images.length;
+        updateLightbox();
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        const modal = document.getElementById('lightboxModal');
+        if (modal.classList.contains('show')) {
+            if (e.key === 'ArrowLeft') {
+                lightboxPrev.click();
+            } else if (e.key === 'ArrowRight') {
+                lightboxNext.click();
+            } else if (e.key === 'Escape') {
+                bootstrap.Modal.getInstance(modal).hide();
+            }
+        }
+    });
+});
+</script>
 {% endblock %}
